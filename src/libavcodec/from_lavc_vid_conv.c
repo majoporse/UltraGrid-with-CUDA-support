@@ -848,8 +848,8 @@ static void yuv420p_to_v210(char * __restrict dst_buffer, AVFrame * __restrict i
                         w1_2 = w1_2 | (*src_cb << 2) << 20;
                         src_cb++;
 
-                        w0_3 = *src_y1++;
-                        w1_3 = *src_y2++;
+                        w0_3 = *src_y1++ << 2;
+                        w1_3 = *src_y2++ << 2;
                         w0_3 = w0_3 | (*src_cr << 2) << 10;
                         w1_3 = w1_3 | (*src_cr << 2) << 10;
                         src_cr++;
@@ -1050,6 +1050,9 @@ static inline void nv12_to_rgb(char * __restrict dst_buffer, AVFrame * __restric
                         }
 
                         y = (*src_y++ - 16) * Y_SCALE;
+                        r = YCBCR_TO_R_709_SCALED(y, cb, cr) >> COMP_BASE;
+                        g = YCBCR_TO_G_709_SCALED(y, cb, cr) >> COMP_BASE;
+                        b = YCBCR_TO_B_709_SCALED(y, cb, cr) >> COMP_BASE;
                         if (rgba) {
                                 *((uint32_t *)(void *) dst) = MK_RGBA(r, g, b, alpha_mask, 8);
                                 dst += 4;
@@ -1202,9 +1205,9 @@ static inline void yuv444p_to_rgb(char * __restrict dst_buffer, AVFrame * __rest
                 unsigned char *dst = (unsigned char *) dst_buffer + pitch * y;
 
                 OPTIMIZED_FOR (int x = 0; x < width; ++x) {
-                        int cb = *src_cb++ - 128;
-                        int cr = *src_cr++ - 128;
-                        int y = *src_y++ * Y_SCALE;
+                        int cb = *src_cb++ - (1 << 7);
+                        int cr = *src_cr++ - (1 << 7);
+                        int y = (*src_y++ - (1 << 4)) * Y_SCALE;
                         comp_type_t r = YCBCR_TO_R_709_SCALED(y, cb, cr) >> COMP_BASE;
                         comp_type_t g = YCBCR_TO_G_709_SCALED(y, cb, cr) >> COMP_BASE;
                         comp_type_t b = YCBCR_TO_B_709_SCALED(y, cb, cr) >> COMP_BASE;
@@ -1350,24 +1353,24 @@ static inline void yuv444p1Xle_to_v210(unsigned in_depth, char * __restrict dst_
                 OPTIMIZED_FOR (int x = 0; x < width / 6; ++x) {
                         uint32_t w0_0, w0_1, w0_2, w0_3;
 
-                        w0_0 = ((src_cb[0] >> (in_depth - 10U)) + (src_cb[1] >> (in_depth - 10U))) / 2;
+                        w0_0 =        ((src_cb[0] >> (in_depth - 10U)) + (src_cb[1] >> (in_depth - 10U))) / 2;
                         w0_0 = w0_0 | (*src_y++ >> (in_depth - 10U)) << 10U;
                         w0_0 = w0_0 | ((src_cr[0] >> (in_depth - 10U)) + (src_cr[1] >> (in_depth - 10U))) / 2 << 20U;
                         src_cb += 2;
                         src_cr += 2;
 
-                        w0_1 = *src_y++;
+                        w0_1 = *src_y++ >> (in_depth - 10U);
                         w0_1 = w0_1 | ((src_cb[0] >> (in_depth - 10U)) + (src_cb[1] >> (in_depth - 10U))) / 2 << 10U;
                         w0_1 = w0_1 | (*src_y++ >> (in_depth - 10U)) << 20U;
                         src_cb += 2;
 
-                        w0_2 = ((src_cr[0] >> (in_depth - 10U)) + (src_cr[1] >> (in_depth - 10U))) / 2;
+                        w0_2 =        ((src_cr[0] >> (in_depth - 10U)) + (src_cr[1] >> (in_depth - 10U))) / 2;
                         w0_2 = w0_2 | (*src_y++ >> (in_depth - 10U)) << 10U;
                         w0_2 = w0_2 | ((src_cb[0] >> (in_depth - 10U)) + (src_cb[1] >> (in_depth - 10U))) / 2 << 20U;
                         src_cr += 2;
                         src_cb += 2;
 
-                        w0_3 = *src_y++;
+                        w0_3 = *src_y++ >> (in_depth - 10U);
                         w0_3 = w0_3 | ((src_cr[0] >> (in_depth - 10U)) + (src_cr[1] >> (in_depth - 10U))) / 2 << 10U;
                         w0_3 = w0_3 | ((*src_y++ >> (in_depth - 10U))) << 20U;
                         src_cr += 2;
@@ -1648,12 +1651,12 @@ static inline void yuv444p10le_to_rgb(char * __restrict dst_buffer, AVFrame * __
                 uint8_t *dst = (uint8_t *)(void *)(dst_buffer + y * pitch);
 
                 OPTIMIZED_FOR (int x = 0; x < width; ++x) {
-                        comp_type_t cb = (*src_cb++ >> 2) - 128;
-                        comp_type_t cr = (*src_cr++ >> 2) - 128;
-                        comp_type_t y = (*src_y++ >> 2) * Y_SCALE;
-                        comp_type_t r = YCBCR_TO_R_709_SCALED(y, cb, cr) >> COMP_BASE;
-                        comp_type_t g = YCBCR_TO_G_709_SCALED(y, cb, cr) >> COMP_BASE;
-                        comp_type_t b = YCBCR_TO_B_709_SCALED(y, cb, cr) >> COMP_BASE;
+                        comp_type_t cb = (*src_cb++) - (1 << 9);
+                        comp_type_t cr = (*src_cr++) - (1 << 9);
+                        comp_type_t y = ((*src_y++) - (1 << 6)) * Y_SCALE;
+                        comp_type_t r = YCBCR_TO_R_709_SCALED(y, cb, cr) >> (COMP_BASE + 2);
+                        comp_type_t g = YCBCR_TO_G_709_SCALED(y, cb, cr) >> (COMP_BASE + 2);
+                        comp_type_t b = YCBCR_TO_B_709_SCALED(y, cb, cr) >> (COMP_BASE + 2);
                         if (rgba) {
                                 *(uint32_t *)(void *) dst = MK_RGBA(r, g, b, alpha_mask, 8);
                                 dst += 4;
@@ -2045,11 +2048,12 @@ static void ayuv64_to_uyvy(char * __restrict dst_buffer, AVFrame * __restrict in
                 uint8_t *src = (uint8_t *)(void *)(in_frame->data[0] + in_frame->linesize[0] * y);
                 uint8_t *dst = (uint8_t *)(void *)(dst_buffer + y * pitch);
 
-                OPTIMIZED_FOR (int x = 0; x < ((width + 1) & ~1); ++x) {
-                        *dst++ = (src[1] + src[9] / 2);  // U
+                OPTIMIZED_FOR (int x = 0; x < width; x+=2) {
+                        *dst++ = ((src[5] + src[5+8]) / 2);  // U
                         *dst++ = src[3];                 // Y
-                        *dst++ = (src[5] + src[13] / 2); // V
+                        *dst++ = ((src[7] + src[7+8]) / 2); // V
                         *dst++ = src[11];                // Y
+                        src += 16;
                 }
         }
 }
@@ -2092,7 +2096,7 @@ static void ayuv64_to_v210(char * __restrict dst_buffer, AVFrame * __restrict in
                         w = w | ((src[3] >> 6U) + (src[7] >> 6U)) / 2 << 20U; // U0 Y0a V0
                         *dst++ = w; // flush output
 
-                        w = src[5]; // Y0b |
+                        w = src[5] >> 6U; // Y0b |
                         src += 8; // move to next 2 words
                         w = w | ((src[2] >> 6U) + (src[6] >> 6U)) / 2 << 10U; // Y0b | U1
                         w = w | (src[1] >> 6U) << 20U; // Y0b | U1 Y1a
@@ -2104,7 +2108,7 @@ static void ayuv64_to_v210(char * __restrict dst_buffer, AVFrame * __restrict in
                         w = w | ((src[2] >> 6U) + (src[6] >> 6U)) / 2 << 20U; // V1 Y1a | U2
                         *dst++ = w;
 
-                        w = src[1]; // Y2a
+                        w = src[1] >> 6U; // Y2a
                         w = w | ((src[3] >> 6U) + (src[7] >> 6U)) / 2 << 10U; // Y2a V2
                         w = w | ((src[5] >> 6U)) << 20U; // Y2a V2 Y2b |
                         *dst++ = w;
@@ -2371,7 +2375,7 @@ static decoder_t get_av_and_uv_conversion(enum AVPixelFormat av_codec, codec_t u
         }
         return NULL;
 }
-
+bool cuda_devices_explicit = false;
 void
 av_to_uv_conversion_destroy(av_to_uv_convert_t **s)
 {
@@ -2401,16 +2405,16 @@ cuda_conv_enabled()
 static enum AVPixelFormat
 get_first_supported_cuda(const enum AVPixelFormat *fmts)
 {
-        for (; *fmts != AV_PIX_FMT_NONE; fmts++) {
-                for (unsigned i = 0;
-                     i < sizeof from_lavc_cuda_supp_formats /
-                             sizeof from_lavc_cuda_supp_formats[0];
-                     ++i) {
-                        if (*fmts == from_lavc_cuda_supp_formats[i]) {
-                                return *fmts;
-                        }
-                }
-        }
+        // for (; *fmts != AV_PIX_FMT_NONE; fmts++) {
+        //         for (unsigned i = 0;
+        //              i < sizeof from_lavc_cuda_supp_formats /
+        //                      sizeof from_lavc_cuda_supp_formats[0];
+        //              ++i) {
+        //                 if (*fmts == from_lavc_cuda_supp_formats[i]) {
+        //                         return *fmts;
+        //                 }
+        //         }
+        // }
         return AV_PIX_FMT_NONE;
 }
 

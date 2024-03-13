@@ -1564,25 +1564,25 @@ set_convertible_formats(codec_t in_codec, struct to_lavc_req_prop req_prop,
         }
 }
 
-static void
+static void //idk what this is for
 set_convertible_formats_cuda(codec_t in_codec, struct to_lavc_req_prop req_prop,
                              int fmt_set[static AV_PIX_FMT_NB],
                              struct lavc_compare_convs_data *comp_data)
 {
-        for (unsigned i = 0; i < sizeof to_lavc_cuda_supp_formats /
-                                     sizeof to_lavc_cuda_supp_formats[0];
-             i++) {
-                const enum AVPixelFormat f = to_lavc_cuda_supp_formats[i];
-                if (!filter(&req_prop, in_codec, f)) {
-                        continue;
-                }
-                fmt_set[f]                    = 1;
-                const struct pixfmt_desc desc = av_pixfmt_get_desc(f);
-                MSG(DEBUG2, "Adding CUDA-convertible format %s\n",
-                    av_get_pix_fmt_name(f));
-                comp_data->descs[f] = desc;
-                comp_data->steps[f] = 1;
-        }
+        // for (unsigned i = 0; i < sizeof to_lavc_cuda_supp_formats /
+        //                              sizeof to_lavc_cuda_supp_formats[0];
+        //      i++) {
+        //         const enum AVPixelFormat f = to_lavc_cuda_supp_formats[i];
+        //         if (!filter(&req_prop, in_codec, f)) {
+        //                 continue;
+        //         }
+        //         fmt_set[f]                    = 1;
+        //         const struct pixfmt_desc desc = av_pixfmt_get_desc(f);
+        //         MSG(DEBUG2, "Adding CUDA-convertible format %s\n",
+        //             av_get_pix_fmt_name(f));
+        //         comp_data->descs[f] = desc;
+        //         comp_data->steps[f] = 1;
+        // }
 }
 
 /// @todo TOREMOVE after cuda conversions implemented
@@ -1592,12 +1592,6 @@ cuda_conv_enabled()
         if (!cuda_devices_explicit) {
                 return false;
         }
-        struct to_lavc_vid_conv_cuda *s =
-            to_lavc_vid_conv_cuda_init(UYVY, 1, 1, AV_PIX_FMT_YUV444P);
-        if (s == NULL) {
-                return false;
-        }
-        to_lavc_vid_conv_cuda_destroy(&s);
         return true;
 }
 
@@ -1657,7 +1651,7 @@ struct to_lavc_vid_conv {
         decoder_t           decoder;
         pixfmt_callback_t   pixfmt_conv_callback;
 
-        struct to_lavc_vid_conv_cuda *cuda_conv_state;
+        struct to_lavc_conv_cuda *cuda_conv_state;
 };
 
 static void to_lavc_memcpy_data(AVFrame * __restrict out_frame, const unsigned char * __restrict in_data, int width, int height)
@@ -1736,7 +1730,7 @@ struct to_lavc_vid_conv *to_lavc_vid_conv_init(codec_t in_pixfmt, int width, int
         } else {
                 if (cuda_conv_enabled()) {
                         s->cuda_conv_state = to_lavc_vid_conv_cuda_init(
-                            in_pixfmt, width, height, out_pixfmt);
+                            in_pixfmt, out_pixfmt, width, height);
                         if (s->cuda_conv_state != NULL) {
                                 MSG(NOTICE, "Using CUDA FFmpeg conversions.\n");
                                 return s;
