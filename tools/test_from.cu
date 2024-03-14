@@ -95,15 +95,15 @@ int main(int argc, char *argv[]){
     cudaEventCreate(&stop);
 
     char *dst_cpu = nullptr;
-    auto state = from_lavc_vid_conv_cuda_init(converted, out_codec);
-    if (!state->ptr)
+    auto state = av_to_uv_conversion_cuda_init(converted, out_codec);
+    if (!state)
         return -1;
 
-    /* time the conversion with intermediate */
+    /* time the gpu implementation */
     float count_gpu = 0;
     for (int i = 0; i < 100; ++i){
         cudaEventRecord(start, 0);
-        dst_cpu = convert_from_lavc(state, converted);
+        dst_cpu = av_to_uv_convert_cuda(state, converted);
         cudaEventRecord(stop, 0);
         cudaEventSynchronize(stop);
         float time;
@@ -143,7 +143,7 @@ int main(int argc, char *argv[]){
     std::cout << cudaGetErrorString(cudaGetLastError()) << "\n";
 
     //clean-up
-    from_lavc_destroy(&state);
+    av_to_uv_conversion_cuda_destroy(&state);
 
     cudaEventDestroy(start);
     cudaEventDestroy(stop);

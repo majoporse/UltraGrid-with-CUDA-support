@@ -1,4 +1,3 @@
-#define HAVE_CUDA
 #include "../src/libavcodec/from_lavc_vid_conv_cuda.h"
 #include "../src/libavcodec/lavc_common.h"
 
@@ -7,7 +6,6 @@
 
 #include "../src/libavcodec/from_lavc_vid_conv.h"
 #include "../src/libavcodec/to_lavc_vid_conv.h"
-#include "../src/libavcodec/lavc_common.h"
 #include "../src/video_codec.h"
 
 #include <map>
@@ -234,7 +232,7 @@ void benchmark(AVFrame *f1, AVPixelFormat AV_format, codec_t UG_format, std::ofs
 
     //---------------------------------------gpu implementation
     char *dst_cpu = nullptr;
-    auto state = from_lavc_vid_conv_cuda_init(converted, UG_format);
+    auto state = av_to_uv_conversion_cuda_init(converted, UG_format);
 
     if (!state->ptr){
         return;
@@ -248,7 +246,7 @@ void benchmark(AVFrame *f1, AVPixelFormat AV_format, codec_t UG_format, std::ofs
     float count_gpu = 0;
     for (int i = 0; i < 10; ++i){
         cudaEventRecord(start, 0);
-        dst_cpu = convert_from_lavc(state, converted);
+        dst_cpu = av_to_uv_convert_cuda(state, converted);
         cudaEventRecord(stop, 0);
         cudaEventSynchronize(stop);
         float time;
@@ -269,7 +267,7 @@ void benchmark(AVFrame *f1, AVPixelFormat AV_format, codec_t UG_format, std::ofs
     //clean-up
     std::cout << "A "; std::cout.flush();
     av_frame_free(&converted);
-    from_lavc_destroy(&state);
+    av_to_uv_conversion_cuda_destroy(&state);
     cudaEventDestroy(start);
     cudaEventDestroy(stop);
 

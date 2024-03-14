@@ -1,5 +1,5 @@
-#include "to_lavc.h"
-#include "from_lavc.h"
+#include "../src/libavcodec/from_lavc_vid_conv_cuda.h"
+#include "../src/libavcodec/to_lavc_vid_conv_cuda.h"
 #include <libavutil/pixfmt.h>
 #include "../src/config_unix.h"
 #include "../src/libavcodec/to_lavc_vid_conv.h"
@@ -88,9 +88,9 @@ int main(int argc, char *argv[]){
             count_gpu += time;
         }
         count_gpu /= 100.0;
-        from_state1 = from_lavc_vid_conv_cuda_init(frame1, RGB);
+        from_state1 = av_to_uv_conversion_cuda_init(frame1, RGB);
         if (from_state1->ptr){
-            dst_cpu1 = convert_from_lavc(from_state1, frame1);
+            dst_cpu1 = av_to_uv_convert_cuda(from_state1, frame1);
         }
 
     } else {
@@ -116,10 +116,10 @@ int main(int argc, char *argv[]){
         frame2->format = AV_codec; //these are not set inside the UG call
         frame2->width = width;
         frame2->height = height;
-        from_state2 = from_lavc_vid_conv_cuda_init(frame2, RGB);
+        from_state2 = av_to_uv_conversion_cuda_init(frame2, RGB);
         if (from_state2->ptr){
 
-            dst_cpu2 = convert_from_lavc(from_state2, frame2);
+            dst_cpu2 = av_to_uv_convert_cuda(from_state2, frame2);
 
             uint8_t *f1, *f2;
             f1 = (uint8_t *)dst_cpu1;
@@ -145,7 +145,7 @@ int main(int argc, char *argv[]){
               << "cpu implementation time: " << std::fixed  << std::setprecision(10) << count / 1000'000.0<< "ms\n";
     std::cout << cudaGetErrorString(cudaGetLastError()) << "\n";
 
-    from_lavc_destroy(&from_state1);
-    from_lavc_destroy(&from_state2);
+    av_to_uv_conversion_cuda_destroy(&from_state1);
+    av_to_uv_conversion_cuda_destroy(&from_state2);
     to_lavc_vid_conv_cuda_destroy(&state);
 }
