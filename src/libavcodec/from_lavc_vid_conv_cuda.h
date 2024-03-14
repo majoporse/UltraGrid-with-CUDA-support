@@ -11,28 +11,29 @@
 
 #include "../libavcodec/lavc_common.h"
 #include "../video_codec.h"
+#include "cuda_utils.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/// @note needs to support conversion for all dst codec_t
-static const enum AVPixelFormat from_lavc_cuda_supp_formats[] = {
-        AV_PIX_FMT_YUV422P
-};
+typedef struct {
+    char * ptr;
+    codec_t to;
+    char *intermediate;
+    char *gpu_out_buffer;
+    AVF_GPU_wrapper *wrapper;
+    AVFrame *gpu_frame;
+} from_lavc_conv_state;
 
-struct av_to_uv_convert_cuda;
-
+#define HAVE_CUDA
 #ifdef HAVE_CUDA
-struct av_to_uv_convert_cuda *
-get_av_to_uv_cuda_conversion(enum AVPixelFormat av_codec, codec_t uv_codec);
-void av_to_uv_convert_cuda(struct av_to_uv_convert_cuda *state,
-                           char *__restrict dst_buffer,
-                           struct AVFrame *__restrict in_frame, int width,
-                           int height, int pitch,
-                           const int *__restrict rgb_shift);
-void av_to_uv_conversion_cuda_destroy(struct av_to_uv_convert_cuda **state);
 
+char *av_to_uv_convert_cuda(from_lavc_conv_state *state, const AVFrame* frame);
+
+ from_lavc_conv_state *av_to_uv_conversion_cuda_init(const AVFrame*, codec_t);
+
+void av_to_uv_conversion_cuda_destroy(from_lavc_conv_state **);
 #else
 
 typedef struct{}from_lavc_conv_state;

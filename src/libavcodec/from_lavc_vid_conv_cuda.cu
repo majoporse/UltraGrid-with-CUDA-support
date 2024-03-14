@@ -1286,7 +1286,7 @@ const std::map<int, void (*) (const AVFrame *, char *, char *)> conversions_from
 /*                                              INTERFACE                                                     */
 /**************************************************************************************************************/
 
-char *convert_from_lavc(from_lavc_conv_state *state, const AVFrame* frame) {
+extern "C" char *av_to_uv_convert_cuda(from_lavc_conv_state *state, const AVFrame* frame) {
     auto dst = state->ptr;
     auto to = state->to;
 
@@ -1312,7 +1312,7 @@ char *convert_from_lavc(from_lavc_conv_state *state, const AVFrame* frame) {
     return dst;
 }
 
-from_lavc_conv_state *from_lavc_vid_conv_cuda_init(const AVFrame *frame, codec_t out){
+extern "C" from_lavc_conv_state *av_to_uv_conversion_cuda_init(const AVFrame *frame, codec_t out){
     char *dst_ptr;
     char *intermediate;
     char *gpu_out_buffer;
@@ -1332,13 +1332,13 @@ from_lavc_conv_state *from_lavc_vid_conv_cuda_init(const AVFrame *frame, codec_t
     wrapper = (AVF_GPU_wrapper *) malloc(sizeof(AVF_GPU_wrapper));
 
     alloc(wrapper, frame);
-
+    
     auto ret = (from_lavc_conv_state *) malloc(sizeof(from_lavc_conv_state));
     *ret = {dst_ptr, out, intermediate, gpu_out_buffer, wrapper, gpu_frame};
     return ret;
 }
 
-void from_lavc_destroy(from_lavc_conv_state **s){
+extern "C" void av_to_uv_conversion_cuda_destroy(from_lavc_conv_state **s){
     auto state = *s;
     cudaFreeHost(state->ptr);
     cudaFree(state->intermediate);

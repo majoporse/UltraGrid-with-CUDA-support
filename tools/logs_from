@@ -1,504 +1,504 @@
 yuv420p10le --> v210
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 2.8242239952ms
-cpu implementation time: 0.5099030937ms
+gpu implementation time: 3.5931453705ms
+cpu implementation time: 0.6891938125ms
 no error
 ----------------------------------------------
 yuv420p10le --> UYVY
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 2.1162590981ms
-cpu implementation time: 0.4888509062ms
+gpu implementation time: 2.1445407867ms
+cpu implementation time: 0.4568953125ms
 no error
 ----------------------------------------------
 yuv420p10le --> RGB
 maximum difference against ultragrid implementation: 1
-gpu implementation time: 2.5261185169ms
-cpu implementation time: 1.0368491875ms
+gpu implementation time: 2.6392769814ms
+cpu implementation time: 0.9566556250ms
 no error
 ----------------------------------------------
 yuv420p10le --> RGBA
 maximum difference against ultragrid implementation: 1
-gpu implementation time: 2.9145727158ms
-cpu implementation time: 1.1026730000ms
+gpu implementation time: 2.8927137852ms
+cpu implementation time: 1.4003192500ms
 no error
 ----------------------------------------------
 yuv420p10le --> R10k
 maximum difference against ultragrid implementation: 64
-gpu implementation time: 2.7817759514ms
-cpu implementation time: 1.3247215000ms
+gpu implementation time: 2.9257473946ms
+cpu implementation time: 1.3791136250ms
 no error
 ----------------------------------------------
 yuv422p10le --> v210
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 2.8588480949ms
-cpu implementation time: 0.5266166875ms
+gpu implementation time: 2.7900032997ms
+cpu implementation time: 0.4840749062ms
 no error
 ----------------------------------------------
 yuv422p10le --> UYVY
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 2.5916223526ms
-cpu implementation time: 0.4153288125ms
+gpu implementation time: 2.5908770561ms
+cpu implementation time: 0.4433170000ms
 no error
 ----------------------------------------------
 yuv422p10le --> RGB
 maximum difference against ultragrid implementation: 1
-gpu implementation time: 2.8061308861ms
-cpu implementation time: 1.0862358750ms
+gpu implementation time: 2.8852925301ms
+cpu implementation time: 1.2251747500ms
 no error
 ----------------------------------------------
 yuv422p10le --> RGBA
 maximum difference against ultragrid implementation: 1
-gpu implementation time: 3.1949954033ms
-cpu implementation time: 1.2919732500ms
+gpu implementation time: 3.1994910240ms
+cpu implementation time: 1.2487473750ms
 no error
 ----------------------------------------------
 yuv422p10le --> R10k
 maximum difference against ultragrid implementation: 64
-gpu implementation time: 3.1116127968ms
-cpu implementation time: 1.4695251250ms
+gpu implementation time: 3.2632033825ms
+cpu implementation time: 1.3183092500ms
 no error
 ----------------------------------------------
 yuv444p10le --> v210
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 3.3753120899ms
-cpu implementation time: 1.0754932500ms
+gpu implementation time: 3.4408257008ms
+cpu implementation time: 0.7432425000ms
 no error
 ----------------------------------------------
 yuv444p10le --> UYVY
 maximum difference against ultragrid implementation: 1
-gpu implementation time: 3.1190974712ms
-cpu implementation time: 0.6041348750ms
+gpu implementation time: 3.1429343224ms
+cpu implementation time: 0.5043499062ms
 no error
 ----------------------------------------------
 yuv444p10le --> R10k
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 3.6923422813ms
-cpu implementation time: 1.3333773750ms
+gpu implementation time: 3.6762721539ms
+cpu implementation time: 1.2794855000ms
 no error
 ----------------------------------------------
 yuv444p10le --> RGB
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 3.4399325848ms
-cpu implementation time: 1.5479906250ms
+gpu implementation time: 3.5110049248ms
+cpu implementation time: 1.3761981250ms
 no error
 ----------------------------------------------
 yuv444p10le --> RGBA
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 3.7811393738ms
-cpu implementation time: 1.2012177500ms
+gpu implementation time: 3.7539906502ms
+cpu implementation time: 1.7727032500ms
 no error
 ----------------------------------------------
 yuv444p10le --> R12L
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 4.4362978935ms
-cpu implementation time: 1.9797792500ms
+gpu implementation time: 4.3724575043ms
+cpu implementation time: 1.2975337500ms
 no error
 ----------------------------------------------
 yuv444p10le --> RG48
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 4.3863105774ms
-cpu implementation time: 1.7254386250ms
+gpu implementation time: 4.3345441818ms
+cpu implementation time: 1.7040343750ms
 no error
 ----------------------------------------------
 yuv444p10le --> Y416
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 5.1763296127ms
-cpu implementation time: 2.1537967500ms
+gpu implementation time: 5.0305919647ms
+cpu implementation time: 1.9726396250ms
 no error
 ----------------------------------------------
 p010le --> v210
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 2.2551741600ms
-cpu implementation time: 0.5904603125ms
+gpu implementation time: 2.3642337322ms
+cpu implementation time: 0.4244576875ms
 no error
 ----------------------------------------------
 p010le --> UYVY
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 2.1009278297ms
-cpu implementation time: 0.4472421875ms
+gpu implementation time: 2.1421728134ms
+cpu implementation time: 0.4610089063ms
 no error
 ----------------------------------------------
 yuv420p --> v210
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 1.7610528469ms
-cpu implementation time: 0.3902209062ms
+gpu implementation time: 1.7902879715ms
+cpu implementation time: 0.3537591875ms
 no error
 ----------------------------------------------
 yuv420p --> UYVY
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 1.5485121012ms
-cpu implementation time: 0.3638638125ms
+gpu implementation time: 1.6785472631ms
+cpu implementation time: 0.3858720000ms
 no error
 ----------------------------------------------
 yuv420p --> RGB
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 1.8897953033ms
-cpu implementation time: 1.1672091250ms
+gpu implementation time: 1.9500801563ms
+cpu implementation time: 1.3708061250ms
 no error
 ----------------------------------------------
 yuv420p --> RGBA
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 2.3871550560ms
-cpu implementation time: 1.2176162500ms
+gpu implementation time: 2.3103425503ms
+cpu implementation time: 1.0904542500ms
 no error
 ----------------------------------------------
 yuv422p --> v210
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 2.0258431435ms
-cpu implementation time: 0.3881489062ms
+gpu implementation time: 2.0819907188ms
+cpu implementation time: 0.3788785000ms
 no error
 ----------------------------------------------
 yuv422p --> UYVY
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 1.7302048206ms
-cpu implementation time: 0.4374830937ms
+gpu implementation time: 1.8692862988ms
+cpu implementation time: 0.3867605937ms
 no error
 ----------------------------------------------
 yuv422p --> RGB
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 2.1733310223ms
-cpu implementation time: 1.0755885000ms
+gpu implementation time: 2.1432957649ms
+cpu implementation time: 1.0236623750ms
 no error
 ----------------------------------------------
 yuv422p --> RGBA
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 2.3847742081ms
-cpu implementation time: 1.2423052500ms
+gpu implementation time: 2.4870719910ms
+cpu implementation time: 1.2044137500ms
 no error
 ----------------------------------------------
 yuv444p --> v210
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 2.3245694637ms
-cpu implementation time: 0.3784619062ms
+gpu implementation time: 2.4068033695ms
+cpu implementation time: 0.7500356250ms
 no error
 ----------------------------------------------
 yuv444p --> UYVY
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 2.4145090580ms
-cpu implementation time: 0.4209059063ms
+gpu implementation time: 2.0729088783ms
+cpu implementation time: 0.3951811875ms
 no error
 ----------------------------------------------
 yuv444p --> RGB
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 2.3422753811ms
-cpu implementation time: 1.1261397500ms
+gpu implementation time: 2.3523552418ms
+cpu implementation time: 1.2010342500ms
 no error
 ----------------------------------------------
 yuv444p --> RGBA
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 2.6532673836ms
-cpu implementation time: 1.2485422500ms
+gpu implementation time: 2.6448831558ms
+cpu implementation time: 1.1857930000ms
 no error
 ----------------------------------------------
 yuvj420p --> v210
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 1.7677695751ms
-cpu implementation time: 0.3527508125ms
+gpu implementation time: 1.9783073664ms
+cpu implementation time: 0.4325889063ms
 no error
 ----------------------------------------------
 yuvj420p --> UYVY
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 1.5865088701ms
-cpu implementation time: 0.4346455938ms
+gpu implementation time: 1.6777311563ms
+cpu implementation time: 0.3752780000ms
 no error
 ----------------------------------------------
 yuvj420p --> RGB
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 1.8763488531ms
-cpu implementation time: 0.9274278750ms
+gpu implementation time: 2.0145823956ms
+cpu implementation time: 1.2877357500ms
 no error
 ----------------------------------------------
 yuvj420p --> RGBA
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 2.3827357292ms
-cpu implementation time: 1.1124308750ms
+gpu implementation time: 2.2900414467ms
+cpu implementation time: 1.1549263750ms
 no error
 ----------------------------------------------
 yuvj422p --> v210
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 1.9636417627ms
-cpu implementation time: 0.3910404063ms
+gpu implementation time: 2.1239230633ms
+cpu implementation time: 0.3803805937ms
 no error
 ----------------------------------------------
 yuvj422p --> UYVY
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 1.7559423447ms
-cpu implementation time: 0.3981439063ms
+gpu implementation time: 1.9334785938ms
+cpu implementation time: 0.3569539063ms
 no error
 ----------------------------------------------
 yuvj422p --> RGB
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 2.1829378605ms
-cpu implementation time: 1.0509777500ms
+gpu implementation time: 2.1144864559ms
+cpu implementation time: 0.9480445000ms
 no error
 ----------------------------------------------
 yuvj422p --> RGBA
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 2.3796768188ms
-cpu implementation time: 1.1145602500ms
+gpu implementation time: 2.4693856239ms
+cpu implementation time: 1.2165922500ms
 no error
 ----------------------------------------------
 yuvj444p --> v210
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 2.3426785469ms
-cpu implementation time: 0.4008840000ms
+gpu implementation time: 2.4217696190ms
+cpu implementation time: 0.4304291875ms
 no error
 ----------------------------------------------
 yuvj444p --> UYVY
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 2.2618210316ms
-cpu implementation time: 0.3835465000ms
+gpu implementation time: 2.0840511322ms
+cpu implementation time: 0.4317254062ms
 no error
 ----------------------------------------------
 yuvj444p --> RGB
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 2.3589406013ms
-cpu implementation time: 1.1295520000ms
+gpu implementation time: 2.3883709908ms
+cpu implementation time: 1.1863342500ms
 no error
 ----------------------------------------------
 yuvj444p --> RGBA
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 2.6725311279ms
-cpu implementation time: 1.2243572500ms
+gpu implementation time: 2.7991423607ms
+cpu implementation time: 1.3666953750ms
 no error
 ----------------------------------------------
 nv12 --> UYVY
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 1.6175101995ms
-cpu implementation time: 0.3886099063ms
+gpu implementation time: 1.6089599133ms
+cpu implementation time: 0.3543870937ms
 no error
 ----------------------------------------------
 nv12 --> RGB
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 1.9197471142ms
-cpu implementation time: 1.0849031250ms
+gpu implementation time: 1.9048831463ms
+cpu implementation time: 1.0499033750ms
 no error
 ----------------------------------------------
 nv12 --> RGBA
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 2.2011327744ms
-cpu implementation time: 1.0746326250ms
+gpu implementation time: 2.3906526566ms
+cpu implementation time: 1.1924787500ms
 no error
 ----------------------------------------------
 yuv444p12le --> R10k
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 3.9518973827ms
-cpu implementation time: 1.6320616250ms
+gpu implementation time: 3.8989310265ms
+cpu implementation time: 1.5670071250ms
 no error
 ----------------------------------------------
 yuv444p12le --> R12L
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 4.2519936562ms
-cpu implementation time: 1.7439690000ms
+gpu implementation time: 4.3676671982ms
+cpu implementation time: 1.4087648750ms
 no error
 ----------------------------------------------
 yuv444p12le --> RG48
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 4.3205986023ms
-cpu implementation time: 1.7795093750ms
+gpu implementation time: 4.4819107056ms
+cpu implementation time: 1.6511250000ms
 no error
 ----------------------------------------------
 yuv444p12le --> UYVY
 maximum difference against ultragrid implementation: 1
-gpu implementation time: 3.1047391891ms
-cpu implementation time: 0.5851725000ms
+gpu implementation time: 3.1219363213ms
+cpu implementation time: 0.5628698125ms
 no error
 ----------------------------------------------
 yuv444p12le --> v210
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 3.3341374397ms
-cpu implementation time: 0.9144548125ms
+gpu implementation time: 3.3533635139ms
+cpu implementation time: 0.6517766875ms
 no error
 ----------------------------------------------
 yuv444p12le --> Y416
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 5.5996828079ms
-cpu implementation time: 3.0318157500ms
+gpu implementation time: 4.9751486778ms
+cpu implementation time: 2.5500420000ms
 no error
 ----------------------------------------------
 yuv444p16le --> R10k
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 4.0591711998ms
-cpu implementation time: 2.2506752500ms
+gpu implementation time: 3.8513247967ms
+cpu implementation time: 1.9912203750ms
 no error
 ----------------------------------------------
 yuv444p16le --> R12L
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 4.5356669426ms
-cpu implementation time: 2.4460547500ms
+gpu implementation time: 4.2271170616ms
+cpu implementation time: 1.7095412500ms
 no error
 ----------------------------------------------
 yuv444p16le --> RG48
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 4.6197595596ms
-cpu implementation time: 2.6374840000ms
+gpu implementation time: 4.3296604156ms
+cpu implementation time: 1.6637365000ms
 no error
 ----------------------------------------------
 yuv444p16le --> UYVY
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 3.1835455894ms
-cpu implementation time: 0.8042088750ms
+gpu implementation time: 3.1392607689ms
+cpu implementation time: 0.8686326875ms
 no error
 ----------------------------------------------
 yuv444p16le --> v210
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 3.5860772133ms
-cpu implementation time: 1.0812357500ms
+gpu implementation time: 3.3724415302ms
+cpu implementation time: 0.8959323750ms
 no error
 ----------------------------------------------
 yuv444p16le --> Y416
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 4.9854626656ms
-cpu implementation time: 2.0849612500ms
+gpu implementation time: 5.0341758728ms
+cpu implementation time: 1.9999427500ms
 no error
 ----------------------------------------------
 ayuv64le --> UYVY
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 3.6621277332ms
-cpu implementation time: 1.0552792500ms
+gpu implementation time: 3.5814881325ms
+cpu implementation time: 0.8427761250ms
 no error
 ----------------------------------------------
 ayuv64le --> v210
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 3.8285057545ms
-cpu implementation time: 1.3362757500ms
+gpu implementation time: 3.7643806934ms
+cpu implementation time: 0.8563985000ms
 no error
 ----------------------------------------------
 ayuv64le --> Y416
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 5.4586234093ms
-cpu implementation time: 2.1883012500ms
+gpu implementation time: 5.4360580444ms
+cpu implementation time: 2.1809545000ms
 no error
 ----------------------------------------------
 gbrap --> RGB
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 2.8764100075ms
-cpu implementation time: 0.4248586875ms
+gpu implementation time: 2.8404638767ms
+cpu implementation time: 0.4649144063ms
 no error
 ----------------------------------------------
 gbrap --> RGBA
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 3.2322850227ms
-cpu implementation time: 0.5876341250ms
+gpu implementation time: 3.0926272869ms
+cpu implementation time: 0.6234991250ms
 no error
 ----------------------------------------------
 gbrp --> RGB
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 3.4065918922ms
-cpu implementation time: 0.4219583125ms
+gpu implementation time: 2.3474402428ms
+cpu implementation time: 0.4175800000ms
 no error
 ----------------------------------------------
 gbrp --> RGBA
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 2.8298656940ms
-cpu implementation time: 0.5870160000ms
+gpu implementation time: 2.7992384434ms
+cpu implementation time: 0.5926823750ms
 no error
 ----------------------------------------------
 rgb24 --> UYVY
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 1.9258785248ms
-cpu implementation time: 1.2696865000ms
+gpu implementation time: 1.9748222828ms
+cpu implementation time: 1.1489192500ms
 no error
 ----------------------------------------------
 rgb24 --> RGBA
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 2.5442688465ms
-cpu implementation time: 0.6838855000ms
+gpu implementation time: 2.5757985115ms
+cpu implementation time: 0.5032638125ms
 no error
 ----------------------------------------------
 gbrp10le --> R10k
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 3.9310913086ms
-cpu implementation time: 1.2891347500ms
+gpu implementation time: 3.7884097099ms
+cpu implementation time: 1.0122363750ms
 no error
 ----------------------------------------------
 gbrp10le --> RGB
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 3.6605408192ms
-cpu implementation time: 1.0538648750ms
+gpu implementation time: 3.5368094444ms
+cpu implementation time: 0.7103743125ms
 no error
 ----------------------------------------------
 gbrp10le --> RGBA
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 3.9229502678ms
-cpu implementation time: 1.5067145000ms
+gpu implementation time: 3.9424476624ms
+cpu implementation time: 1.0522921250ms
 no error
 ----------------------------------------------
 gbrp10le --> RG48
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 4.4102687836ms
-cpu implementation time: 1.8916783750ms
+gpu implementation time: 4.4123201370ms
+cpu implementation time: 1.6227410000ms
 no error
 ----------------------------------------------
 gbrp12le --> R12L
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 4.4090528488ms
-cpu implementation time: 1.1188635000ms
+gpu implementation time: 4.2495999336ms
+cpu implementation time: 0.9374105000ms
 no error
 ----------------------------------------------
 gbrp12le --> R10k
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 3.9346299171ms
-cpu implementation time: 1.2552345000ms
+gpu implementation time: 3.7984447479ms
+cpu implementation time: 0.8287288750ms
 no error
 ----------------------------------------------
 gbrp12le --> RGB
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 3.5642077923ms
-cpu implementation time: 0.7236588750ms
+gpu implementation time: 3.4113280773ms
+cpu implementation time: 0.8360396875ms
 no error
 ----------------------------------------------
 gbrp12le --> RGBA
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 3.9624800682ms
-cpu implementation time: 1.7717440000ms
+gpu implementation time: 3.7765440941ms
+cpu implementation time: 0.9565623125ms
 no error
 ----------------------------------------------
 gbrp12le --> RG48
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 4.3910050392ms
-cpu implementation time: 1.8534623750ms
+gpu implementation time: 4.4554882050ms
+cpu implementation time: 1.6296570000ms
 no error
 ----------------------------------------------
 gbrp16le --> R12L
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 4.4217505455ms
-cpu implementation time: 1.7231886250ms
+gpu implementation time: 4.2204160690ms
+cpu implementation time: 1.3424962500ms
 no error
 ----------------------------------------------
 gbrp16le --> R10k
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 3.7621502876ms
-cpu implementation time: 1.0934097500ms
+gpu implementation time: 3.8436131477ms
+cpu implementation time: 0.9574020000ms
 no error
 ----------------------------------------------
 gbrp16le --> RG48
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 4.3688158989ms
-cpu implementation time: 1.8027726250ms
+gpu implementation time: 4.4127264023ms
+cpu implementation time: 1.5813972500ms
 no error
 ----------------------------------------------
 gbrp12le --> RGB
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 3.4464256763ms
-cpu implementation time: 0.5881411250ms
+gpu implementation time: 3.5173122883ms
+cpu implementation time: 0.6616453125ms
 no error
 ----------------------------------------------
 gbrp12le --> RGBA
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 3.7739040852ms
-cpu implementation time: 1.1441992500ms
+gpu implementation time: 3.7263298035ms
+cpu implementation time: 1.1721052500ms
 no error
 ----------------------------------------------
 rgb48le --> R12L
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 4.1764516830ms
-cpu implementation time: 1.0469040000ms
+gpu implementation time: 4.1303009987ms
+cpu implementation time: 1.2510086250ms
 no error
 ----------------------------------------------
 rgb48le --> RGBA
 maximum difference against ultragrid implementation: 0
-gpu implementation time: 3.5530624390ms
-cpu implementation time: 0.8747625000ms
+gpu implementation time: 3.5529150963ms
+cpu implementation time: 1.2620062500ms
 no error
 ----------------------------------------------

@@ -2393,12 +2393,12 @@ cuda_conv_enabled()
         if (!cuda_devices_explicit) {
                 return false;
         }
-        struct av_to_uv_convert_cuda *s =
-            get_av_to_uv_cuda_conversion(AV_PIX_FMT_YUV422P, UYVY);
-        if (s == NULL) {
-                return false;
-        }
-        av_to_uv_conversion_cuda_destroy(&s);
+        // struct av_to_uv_convert_cuda *s =
+        //     av_to_uv_conversion_cuda_init(AV_PIX_FMT_YUV422P, UYVY);
+        // if (s == NULL) {
+        //         return false;
+        // }
+        // av_to_uv_conversion_cuda_destroy(&s);
         return true;
 }
 
@@ -2693,8 +2693,7 @@ av_to_uv_convert(const av_to_uv_convert_t *convert,
                  const int rgb_shift[3])
 {
         if (convert->cuda_conv_state != NULL) {
-                av_to_uv_convert_cuda(convert->cuda_conv_state, dst, in, width,
-                                      height, pitch, rgb_shift);
+                av_to_uv_convert_cuda(convert->cuda_conv_state, dst);
                 return;
         }
 

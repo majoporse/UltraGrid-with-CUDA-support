@@ -39,18 +39,18 @@ void to_lavc_vid_conv_cuda_destroy(struct to_lavc_vid_conv_cuda **state);
 #ifdef HAVE_CUDA
 #include "cuda_utils.h"
 
-struct to_lavc_conv_cuda {
+typedef struct {
     AVFrame *frame;
     codec_t to;
     char *intermediate_to;
     char *gpu_in_buffer;
     AVFrame *gpu_frame;
     AVF_GPU_wrapper *gpu_wrapper;
-};
+} to_lavc_conv_cuda;
 
 AVFrame *to_lavc_vid_conv_cuda(to_lavc_conv_cuda *, const char *src);
 
-to_lavc_conv_cuda *to_lavc_vid_conv_cuda_init(AVPixelFormat, codec_t, int, int);
+to_lavc_conv_cuda *to_lavc_vid_conv_cuda_init(enum AVPixelFormat, codec_t, int, int);
 
 void to_lavc_vid_conv_cuda_destroy(to_lavc_conv_cuda **);
 >>>>>>> abc5c294b (removed c++20 features + some interface changes to work with UG)

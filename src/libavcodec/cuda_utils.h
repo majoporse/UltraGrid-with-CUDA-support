@@ -10,17 +10,25 @@
 #define BYTE_SWAP(x) x
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
     AVFrame frame;
     int q;
 } AVF_GPU_wrapper;
 
-void alloc(AVF_GPU_wrapper* wrapper, const AVFrame* new_frame);
+void alloc(AVF_GPU_wrapper *wrapper, const AVFrame *new_frame);
 
-void copy_to_device(AVF_GPU_wrapper* wrapper, const AVFrame *new_frame);
+void copy_to_device(AVF_GPU_wrapper *wrapper, const AVFrame *new_frame);
 
-void copy_to_host(AVF_GPU_wrapper* wrapper, const AVFrame *new_frame);
+void copy_to_host(AVF_GPU_wrapper *wrapper, const AVFrame *new_frame);
 
-void free_from_device(AVF_GPU_wrapper* wrapper);
+void free_from_device(AVF_GPU_wrapper *wrapper);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

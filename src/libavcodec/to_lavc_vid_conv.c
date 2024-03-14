@@ -689,7 +689,7 @@ static inline void r10k_to_yuv42Xp10le(AVFrame * __restrict out_frame, const uns
                                 dst_cb[x] = res_cb;
                                 dst_cr[x] = res_cr;
                         } else {
-                                if (x % 2 == 0) {
+                                if (y % 2 == 0) {
                                         dst_cb[x] = res_cb;
                                         dst_cr[x] = res_cr;
                                 } else {
