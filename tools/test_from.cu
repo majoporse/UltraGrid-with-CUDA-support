@@ -151,3 +151,5 @@ int main(int argc, char *argv[]){
     av_frame_free(&converted);
     av_frame_free(&frame);
 }
+//if profile wanted run: sudo /usr/local/cuda/bin/nsys nvprof  ./test_from 7680 4320 in8k.rgb yuv444p10le rgb
+

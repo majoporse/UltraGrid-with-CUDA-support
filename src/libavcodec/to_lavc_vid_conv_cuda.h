@@ -39,6 +39,54 @@ void to_lavc_vid_conv_cuda_destroy(struct to_lavc_vid_conv_cuda **state);
 #ifdef HAVE_CUDA
 #include "cuda_utils.h"
 
+static const enum AVPixelFormat to_lavc_cuda_supp_formats[] = {
+        {AV_PIX_FMT_YUV420P10LE},
+        {AV_PIX_FMT_YUV444P10LE},
+        {AV_PIX_FMT_YUV422P10LE},
+        {AV_PIX_FMT_P010LE},
+        {AV_PIX_FMT_NV12},
+        {AV_PIX_FMT_YUV420P},
+        {AV_PIX_FMT_YUV422P},
+        {AV_PIX_FMT_YUV444P},
+        {AV_PIX_FMT_YUVJ420P},
+        {AV_PIX_FMT_YUVJ422P},
+        {AV_PIX_FMT_YUVJ444P},
+        {AV_PIX_FMT_YUV420P12LE},
+        {AV_PIX_FMT_YUV422P12LE},
+        {AV_PIX_FMT_YUV444P12LE},
+        {AV_PIX_FMT_YUV420P16LE},
+        {AV_PIX_FMT_YUV422P16LE},
+        {AV_PIX_FMT_YUV444P16LE},
+        {AV_PIX_FMT_AYUV64},
+        {AV_PIX_FMT_GBRP},
+        {AV_PIX_FMT_GBRAP},
+        {AV_PIX_FMT_GBRP10LE},
+        {AV_PIX_FMT_GBRP12LE},
+        {AV_PIX_FMT_GBRP16LE},
+        {AV_PIX_FMT_GBRAP10LE},
+        {AV_PIX_FMT_GBRAP12LE},
+        {AV_PIX_FMT_GBRAP16LE},
+        {AV_PIX_FMT_BGR0},
+        {AV_PIX_FMT_BGRA},
+        {AV_PIX_FMT_RGB24},
+        {AV_PIX_FMT_RGB48LE},
+        {AV_PIX_FMT_RGBA64LE},
+        {AV_PIX_FMT_RGBA},
+        {AV_PIX_FMT_Y210},
+#if P210_PRESENT
+        {AV_PIX_FMT_P210LE},
+#endif
+#if XV3X_PRESENT
+        {AV_PIX_FMT_XV30},
+        {AV_PIX_FMT_Y212},
+#endif
+#if VUYX_PRESENT
+        {AV_PIX_FMT_VUYA},
+        {AV_PIX_FMT_VUYX},
+#endif
+        {AV_PIX_FMT_NONE}
+};
+
 typedef struct {
     AVFrame *frame;
     codec_t to;

@@ -1564,25 +1564,25 @@ set_convertible_formats(codec_t in_codec, struct to_lavc_req_prop req_prop,
         }
 }
 
-static void //idk what this is for
+static void
 set_convertible_formats_cuda(codec_t in_codec, struct to_lavc_req_prop req_prop,
                              int fmt_set[static AV_PIX_FMT_NB],
                              struct lavc_compare_convs_data *comp_data)
 {
-        // for (unsigned i = 0; i < sizeof to_lavc_cuda_supp_formats /
-        //                              sizeof to_lavc_cuda_supp_formats[0];
-        //      i++) {
-        //         const enum AVPixelFormat f = to_lavc_cuda_supp_formats[i];
-        //         if (!filter(&req_prop, in_codec, f)) {
-        //                 continue;
-        //         }
-        //         fmt_set[f]                    = 1;
-        //         const struct pixfmt_desc desc = av_pixfmt_get_desc(f);
-        //         MSG(DEBUG2, "Adding CUDA-convertible format %s\n",
-        //             av_get_pix_fmt_name(f));
-        //         comp_data->descs[f] = desc;
-        //         comp_data->steps[f] = 1;
-        // }
+        for (unsigned i = 0; i < sizeof to_lavc_cuda_supp_formats /
+                                     sizeof to_lavc_cuda_supp_formats[0];
+             i++) {
+                const enum AVPixelFormat f = to_lavc_cuda_supp_formats[i];
+                if (!filter(&req_prop, in_codec, f)) {
+                        continue;
+                }
+                fmt_set[f]                    = 1;
+                const struct pixfmt_desc desc = av_pixfmt_get_desc(f);
+                MSG(DEBUG2, "Adding CUDA-convertible format %s\n",
+                    av_get_pix_fmt_name(f));
+                comp_data->descs[f] = desc;
+                comp_data->steps[f] = 1;
+        }
 }
 
 /// @todo TOREMOVE after cuda conversions implemented
@@ -1651,7 +1651,7 @@ struct to_lavc_vid_conv {
         decoder_t           decoder;
         pixfmt_callback_t   pixfmt_conv_callback;
 
-        struct to_lavc_conv_cuda *cuda_conv_state;
+        to_lavc_conv_cuda *cuda_conv_state;
 };
 
 static void to_lavc_memcpy_data(AVFrame * __restrict out_frame, const unsigned char * __restrict in_data, int width, int height)
@@ -1671,11 +1671,22 @@ static void to_lavc_memcpy_data(AVFrame * __restrict out_frame, const unsigned c
 }
 
 struct to_lavc_vid_conv *to_lavc_vid_conv_init(codec_t in_pixfmt, int width, int height, enum AVPixelFormat out_pixfmt, int thread_count) {
-        int ret = 0;
         struct to_lavc_vid_conv *s = (struct to_lavc_vid_conv *) calloc(1, sizeof *s);
         s->in_pixfmt = in_pixfmt;
         s->thread_count = thread_count;
         s->out_frame_parts = (struct AVFrame **) calloc(thread_count, sizeof *s->out_frame_parts);
+
+        if (cuda_conv_enabled()) {
+                s->cuda_conv_state = to_lavc_vid_conv_cuda_init(
+                        in_pixfmt, out_pixfmt, width, height);
+                if (s->cuda_conv_state != NULL) {
+                        MSG(NOTICE, "Using CUDA FFmpeg conversions.\n");
+                        return s;
+                }
+                MSG(ERROR, "Unable to initialize CUDA conv state!\n");
+        }
+
+        int ret = 0;
         for (int i = 0; i < thread_count; i++) {
                 s->out_frame_parts[i] = av_frame_alloc();
         }
@@ -1728,15 +1739,7 @@ struct to_lavc_vid_conv *to_lavc_vid_conv_init(codec_t in_pixfmt, int width, int
                 s->decoded_codec = in_pixfmt;
                 s->decoder = vc_memcpy;
         } else {
-                if (cuda_conv_enabled()) {
-                        s->cuda_conv_state = to_lavc_vid_conv_cuda_init(
-                            in_pixfmt, out_pixfmt, width, height);
-                        if (s->cuda_conv_state != NULL) {
-                                MSG(NOTICE, "Using CUDA FFmpeg conversions.\n");
-                                return s;
-                        }
-                        MSG(ERROR, "Unable to initialize CUDA conv state!\n");
-                }
+                
                 s->decoder = get_decoder_from_uv_to_uv(in_pixfmt, out_pixfmt, &s->decoded_codec);
                 if (s->decoder == NULL) {
                         log_msg(LOG_LEVEL_ERROR, "[lavc] Failed to find a way to convert %s to %s\n",
@@ -1868,6 +1871,9 @@ struct AVFrame *to_lavc_vid_conv(struct to_lavc_vid_conv *s, char *in_data) {
 
 void to_lavc_vid_conv_destroy(struct to_lavc_vid_conv **s_p) {
         struct to_lavc_vid_conv *s = *s_p;
+        if (s->cuda_conv_state != NULL) {
+                to_lavc_vid_conv_cuda_destroy(&s->cuda_conv_state);
+        }
         if (s == NULL) {
                 return;
         }

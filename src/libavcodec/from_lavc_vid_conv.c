@@ -2188,7 +2188,7 @@ struct av_to_uv_convert_state {
         codec_t src_pixfmt;
         codec_t dst_pixfmt;
         decoder_t dec;
-        struct av_to_uv_convert_cuda *cuda_conv_state;
+        struct from_lavc_conv_state *cuda_conv_state;
 };
 
 struct av_to_uv_conversion {
@@ -2393,28 +2393,30 @@ cuda_conv_enabled()
         if (!cuda_devices_explicit) {
                 return false;
         }
-        // struct av_to_uv_convert_cuda *s =
-        //     av_to_uv_conversion_cuda_init(AV_PIX_FMT_YUV422P, UYVY);
-        // if (s == NULL) {
-        //         return false;
-        // }
-        // av_to_uv_conversion_cuda_destroy(&s);
+        AVFrame f;
+        f.format = AV_PIX_FMT_UYVY422;
+        struct from_lavc_conv_state *s =
+            av_to_uv_conversion_cuda_init(&f, UYVY);
+        if (s == NULL) {
+                return false;
+        }
+        av_to_uv_conversion_cuda_destroy(&s);
         return true;
 }
 
 static enum AVPixelFormat
 get_first_supported_cuda(const enum AVPixelFormat *fmts)
 {
-        // for (; *fmts != AV_PIX_FMT_NONE; fmts++) {
-        //         for (unsigned i = 0;
-        //              i < sizeof from_lavc_cuda_supp_formats /
-        //                      sizeof from_lavc_cuda_supp_formats[0];
-        //              ++i) {
-        //                 if (*fmts == from_lavc_cuda_supp_formats[i]) {
-        //                         return *fmts;
-        //                 }
-        //         }
-        // }
+        for (; *fmts != AV_PIX_FMT_NONE; fmts++) {
+                for (unsigned i = 0;
+                     i < sizeof from_lavc_cuda_supp_formats /
+                             sizeof from_lavc_cuda_supp_formats[0];
+                     ++i) {
+                        if (*fmts == from_lavc_cuda_supp_formats[i]) {
+                                return *fmts;
+                        }
+                }
+        }
         return AV_PIX_FMT_NONE;
 }
 
@@ -2424,9 +2426,9 @@ av_to_uv_convert_t *get_av_to_uv_conversion(int av_codec, codec_t uv_codec) {
 
         if (cuda_conv_enabled()) {
                 enum AVPixelFormat f[2] = { av_codec, AV_PIX_FMT_NONE };
-                if (get_first_supported_cuda(f) != AV_PIX_FMT_NONE) {
-                        ret->cuda_conv_state =
-                            get_av_to_uv_cuda_conversion(av_codec, uv_codec);
+                from_lavc_conv_state *s;
+                if ((s = av_to_uv_conversion_cuda_init(f, uv_codec)) != NULL) {
+                        ret->cuda_conv_state = s;
                         if (ret->cuda_conv_state != NULL) {
                                 MSG(NOTICE, "Using CUDA FFmpeg conversions.\n");
                                 return ret;
@@ -2693,7 +2695,7 @@ av_to_uv_convert(const av_to_uv_convert_t *convert,
                  const int rgb_shift[3])
 {
         if (convert->cuda_conv_state != NULL) {
-                av_to_uv_convert_cuda(convert->cuda_conv_state, dst);
+                dst = av_to_uv_convert_cuda(convert->cuda_conv_state, in);
                 return;
         }
 
