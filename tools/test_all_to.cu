@@ -64,6 +64,19 @@ const std::vector<std::tuple<codec_t, AVPixelFormat, int>> convs = {
             { R12L, AV_PIX_FMT_GBRP12LE, 2},
             { R12L, AV_PIX_FMT_GBRP16LE, 2},
             { RG48, AV_PIX_FMT_GBRP12LE, 2},
+#if XV3X_PRESENT
+            { v210, AV_PIX_FMT_XV30, 1 },
+            { Y216, AV_PIX_FMT_Y212, 2 },
+            { Y416, AV_PIX_FMT_XV30, 1 },
+            { v210, AV_PIX_FMT_Y212, 2 },
+#endif
+#if P210_PRESENT
+            { v210, AV_PIX_FMT_P210LE, 2 },
+#endif
+#if VUYX_PRESENT
+            { UYVY, AV_PIX_FMT_VUYA, 1 },
+            { UYVY, AV_PIX_FMT_VUYX, 1 },
+#endif
 };
 
 
