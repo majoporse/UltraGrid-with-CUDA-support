@@ -1124,7 +1124,7 @@ static bool configure_with(struct state_video_compress_libav *s, struct video_de
         s->compressed_desc.color_spec = ug_codec;
         s->compressed_desc.tile_count = 1;
         s->mov_avg_frames = s->mov_avg_comp_duration = 0;
-        
+
         to_lavc_vid_conv_destroy(&s->pixfmt_conversion);
         if ((s->pixfmt_conversion = to_lavc_vid_conv_init(desc.color_spec, desc.width, desc.height, pix_fmt, s->conv_thread_count)) == nullptr) {
                 if (!configure_swscale(s, desc, pix_fmt)) {
@@ -1337,6 +1337,7 @@ static shared_ptr<video_frame> libavcodec_compress_tile(struct module *mod, shar
         list<shared_ptr<void>> cleanup_callbacks; // at function exit handlers
 
         libavcodec_check_messages(s);
+
         if (tx && !video_desc_eq_excl_param(video_desc_from_frame(tx.get()),
                                             s->saved_desc, PARAM_TILE_COUNT)) {
                 cleanup(s);

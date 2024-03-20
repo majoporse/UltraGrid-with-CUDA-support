@@ -62,6 +62,9 @@ static const enum AVPixelFormat from_lavc_cuda_supp_formats[] = {
         AV_PIX_FMT_VUYA,
         AV_PIX_FMT_VUYX,
 #endif
+#if X2RGB10LE_PRESENT
+        AV_PIX_FMT_X2RGB10LE,
+#endif
         AV_PIX_FMT_NONE
 };
 
