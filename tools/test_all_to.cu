@@ -77,6 +77,9 @@ const std::vector<std::tuple<codec_t, AVPixelFormat, int>> convs = {
             { UYVY, AV_PIX_FMT_VUYA, 1 },
             { UYVY, AV_PIX_FMT_VUYX, 1 },
 #endif
+#if X2RGB10LE_PRESENT
+            { R10k, AV_PIX_FMT_X2RGB10LE, 1},
+#endif
 };
 
 

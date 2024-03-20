@@ -123,7 +123,7 @@ __device__ void write_from_v210(const uint32_t *src, FUNC WRITE_RES){
     WRITE_RES(y, cb, cr);
 }
 
-template<typename IN_T, int bit_shift, bool has_alpha, bool bgr>
+template<typename IN_T, int bit_shift, bool has_alpha, AVPixelFormat CODEC>
 __global__ void convert_rgb_from_inter(int width, int height, size_t pitch_in, char *in, AVFrame *out_frame){
     size_t x = blockDim.x * blockIdx.x + threadIdx.x;
     size_t y = blockDim.y * blockIdx.y + threadIdx.y;
@@ -137,16 +137,21 @@ __global__ void convert_rgb_from_inter(int width, int height, size_t pitch_in, c
     IN_T *dst = ((IN_T *) dst_row) + (has_alpha ? 4 : 3) * x;
     uint16_t *src = ((uint16_t *) src_row) + 4 * x;
 
-    if (bgr){
+    if constexpr (CODEC == AV_PIX_FMT_BGRA){
         *dst++ = src[2] >> bit_shift;//B
         *dst++ = src[1] >> bit_shift;//G
         *dst++ = src[0] >> bit_shift;//R
+    } else if constexpr (CODEC == AV_PIX_FMT_X2RGB10LE){
+        *dst++ = (src[0] >> 10U); // [2x r<6]
+        *dst++ = (((src[0] >> 6U) & 0xFU) << 4U) | (src[1] >> 12U); // R[->4] | G[<-4]
+        *dst++ = (((src[1] >> 6U) & 0x3FU) << 2U) | (src[2] >> 14U); // G[->6] | B[<-2]
+        *dst++ = src[2] >> 6U; //B[->8]
     } else{
         *dst++ = *src++ >> bit_shift;
         *dst++ = *src++ >> bit_shift;
         *dst++ = *src++ >> bit_shift;
     }
-    if constexpr (has_alpha){
+    if constexpr (has_alpha && CODEC != AV_PIX_FMT_X2RGB10LE){
         *dst = *src >> bit_shift;
     }
 }
@@ -440,6 +445,7 @@ __global__ void convert_rgb_to_yuv_inter(int width, int height, size_t pitch_in,
         r = byte1 << 8U | (byte2 & 0xC0U);
         g = (byte2 & 0x3FU) << 10U | (byte3 & 0xF0U) << 2U;
         b = (byte3 & 0xFU) << 12U | (byte4 & 0xFCU) << 4U;
+        
     } else if (CODEC == BGR){
         r = src[2] << bit_shift;
         g = src[1] << bit_shift;
@@ -860,12 +866,12 @@ void ayuv64_from_inter(int width, int height, char *intermediate_to, AVFrame *ds
     convert_ayuv64_from_inter<<<grid, block>>>(width, height, pitch_in, intermediate_to, dst_frame);
 }
 
-template<typename T, int bit_shift, bool alpha, bool bgr>
+template<typename T, int bit_shift, bool alpha, AVPixelFormat CODEC>
 void rgb_from_inter(int width, int height, char *intermediate_to, AVFrame *dst_frame){
     size_t pitch_in = vc_get_linesize(width, Y416);
     dim3 grid = dim3((width + BLOCK_SIZE - 1) / BLOCK_SIZE, (height + BLOCK_SIZE - 1) / BLOCK_SIZE );
     dim3 block = dim3(BLOCK_SIZE, BLOCK_SIZE);
-    convert_rgb_from_inter<T, bit_shift, alpha, bgr><<<grid, block>>>(width, height, pitch_in, intermediate_to, dst_frame);
+    convert_rgb_from_inter<T, bit_shift, alpha, CODEC><<<grid, block>>>(width, height, pitch_in, intermediate_to, dst_frame);
 }
 
 template<typename T, int bit_shift>
@@ -1015,15 +1021,15 @@ const std::map<AVPixelFormat, std::tuple<int, void (*)(int, int, char *, AVFrame
         {AV_PIX_FMT_GBRAP16LE, {RGB_INTER_TO, rgbp_from_inter<uint16_t, 0, true>}},
 
         //BGRA
-        {AV_PIX_FMT_BGR0, {RGB_INTER_TO, rgb_from_inter<uint8_t, 8, true, true>}},
-        {AV_PIX_FMT_BGRA, {RGB_INTER_TO, rgb_from_inter<uint8_t, 8, true, true>}},
+        {AV_PIX_FMT_BGR0, {RGB_INTER_TO, rgb_from_inter<uint8_t, 8, true, AV_PIX_FMT_BGRA>}},
+        {AV_PIX_FMT_BGRA, {RGB_INTER_TO, rgb_from_inter<uint8_t, 8, true, AV_PIX_FMT_BGRA>}},
 
         //RGB
-        {AV_PIX_FMT_RGB24, {RGB_INTER_TO, rgb_from_inter<uint8_t, 8, false, false>}},
-        {AV_PIX_FMT_RGB48LE, {RGB_INTER_TO, rgb_from_inter<uint16_t, 0, false, false>}},
+        {AV_PIX_FMT_RGB24, {RGB_INTER_TO, rgb_from_inter<uint8_t, 8, false, AV_PIX_FMT_RGB24>}},
+        {AV_PIX_FMT_RGB48LE, {RGB_INTER_TO, rgb_from_inter<uint16_t, 0, false, AV_PIX_FMT_RGB48LE>}},
 
-        {AV_PIX_FMT_RGBA64LE, {RGB_INTER_TO, rgb_from_inter<uint16_t, 0, true, false>}},
-        {AV_PIX_FMT_RGBA, {RGB_INTER_TO, rgb_from_inter<uint8_t, 8, true, false>}},
+        {AV_PIX_FMT_RGBA64LE, {RGB_INTER_TO, rgb_from_inter<uint16_t, 0, true, AV_PIX_FMT_RGBA64LE>}},
+        {AV_PIX_FMT_RGBA, {RGB_INTER_TO, rgb_from_inter<uint8_t, 8, true, AV_PIX_FMT_RGBA>}},
 
 #if Y210_PRESENT
         {AV_PIX_FMT_Y210, {YUV_INTER_TO, y210_form_inter}},
@@ -1037,7 +1043,10 @@ const std::map<AVPixelFormat, std::tuple<int, void (*)(int, int, char *, AVFrame
 #endif
 #if VUYX_PRESENT
         {AV_PIX_FMT_VUYA, {YUV_INTER_TO, vuya_from_inter<true>}}, //idk how to test these
-        {AV_PIX_FMT_VUYX, {YUV_INTER_TO, vuya_from_inter<false>}} //idk how to test these
+        {AV_PIX_FMT_VUYX, {YUV_INTER_TO, vuya_from_inter<false>}}, //idk how to test these
+#endif
+#if X2RGB10LE_PRESENT
+        {AV_PIX_FMT_X2RGB10LE, {RGB_INTER_TO, rgb_from_inter<uint8_t, 0, true, AV_PIX_FMT_X2RGB10LE>} }, //shift doesnt matter
 #endif
 };
 

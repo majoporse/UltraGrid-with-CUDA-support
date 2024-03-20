@@ -757,7 +757,7 @@ __global__ void gbrap_to_intermediate(char * __restrict dst_buffer, size_t pitch
     }
 }
 
-template<typename IN_T, int bit_shift, bool has_alpha, bool bgr>
+template<typename IN_T, int bit_shift, bool has_alpha, AVPixelFormat CODEC>
 __global__ void rgb_to_intermediate(char * __restrict dst_buffer, size_t pitch, int width, int height, AVFrame *in_frame){
     size_t x = blockDim.x * blockIdx.x + threadIdx.x;
     size_t y = blockDim.y * blockIdx.y + threadIdx.y;
@@ -771,19 +771,24 @@ __global__ void rgb_to_intermediate(char * __restrict dst_buffer, size_t pitch, 
     IN_T *src = ((IN_T *) src_row) + (has_alpha ? 4 : 3) * x;
     uint16_t *dst = ((uint16_t *) dst_row) + 4 * x;
 
-    if constexpr (bgr){
+    if constexpr (CODEC == AV_PIX_FMT_BGRA){
         *dst++ = src[2] << bit_shift;//B
         *dst++ = src[1] << bit_shift;//G
         *dst++ = src[0] << bit_shift;//R
-    } else{
-        *dst++ = src[0] << bit_shift;
-        *dst++ = src[1] << bit_shift;
-        *dst++ = src[2] << bit_shift;
+    } else if (CODEC == AV_PIX_FMT_X2RGB10LE){
+        // [2X R6] [R4 G4] [G6 B2] [B8]
+        dst[0] = (src[0] << 10U) | ((src[1] & 0xF0U) << 2U); //R
+        dst[1] = ((src[1] & 0xFU) << 12U) | ((src[2] & 0b11111100) << 4U); //G
+        dst[2] = ((src[2] & 0x3U) << 14U) | (src[3] << 6U); //B
+    } else {
+        dst[0] = src[0] << bit_shift;
+        dst[1] = src[1] << bit_shift;
+        dst[2] = src[2] << bit_shift;
     }
-    if constexpr (has_alpha){
-        *dst = src[3];
+    if constexpr (has_alpha && CODEC != AV_PIX_FMT_X2RGB10LE){
+        dst[3] = src[3];
     } else{
-        *dst = 0xFFFFU;
+        dst[3] = 0xFFFFU;
     }
 }
 
@@ -1172,7 +1177,7 @@ int convert_grb_to_inter(const AVFrame *frame, char * intermediate, AVFrame *gpu
     return RGB_INTER;
 }
 
-template<typename T, int bit_shift, bool has_alpha, bool bgr>
+template<typename T, int bit_shift, bool has_alpha, AVPixelFormat CODEC>
 int convert_rgb_to_inter(const AVFrame *frame, char * intermediate, AVFrame *gpu_frame){
     int width = frame->width;
     int height = frame->height;
@@ -1181,7 +1186,7 @@ int convert_rgb_to_inter(const AVFrame *frame, char * intermediate, AVFrame *gpu
     dim3 grid = dim3((width + BLOCK_SIZE - 1) / BLOCK_SIZE, (height + BLOCK_SIZE - 1) / BLOCK_SIZE );
     dim3 block = dim3(BLOCK_SIZE, BLOCK_SIZE);
 
-    rgb_to_intermediate<T, bit_shift, has_alpha, bgr><<<grid, block>>>(intermediate, pitch, width, height, gpu_frame);
+    rgb_to_intermediate<T, bit_shift, has_alpha, CODEC><<<grid, block>>>(intermediate, pitch, width, height, gpu_frame);
     return RGB_INTER;
 }
 
@@ -1229,14 +1234,14 @@ const std::map<int, int (*) (const AVFrame *, char *, AVFrame *)> conversions_to
         {AV_PIX_FMT_GBRAP12LE, convert_grb_to_inter<uint16_t, 4, true>},
         {AV_PIX_FMT_GBRAP16LE, convert_grb_to_inter<uint16_t, 0, true>},
 
-        {AV_PIX_FMT_BGR0, convert_rgb_to_inter<uint8_t, 8, true, true>},
-        {AV_PIX_FMT_BGRA, convert_rgb_to_inter<uint8_t, 8, true, true>},
+        {AV_PIX_FMT_BGR0, convert_rgb_to_inter<uint8_t, 8, true, AV_PIX_FMT_BGRA>},
+        {AV_PIX_FMT_BGRA, convert_rgb_to_inter<uint8_t, 8, true, AV_PIX_FMT_BGRA>},
         //RGB
-        {AV_PIX_FMT_RGB24, convert_rgb_to_inter<uint8_t, 8, false, false>},
-        {AV_PIX_FMT_RGB48LE, convert_rgb_to_inter<uint16_t, 0, false, false>},
+        {AV_PIX_FMT_RGB24, convert_rgb_to_inter<uint8_t, 8, false, AV_PIX_FMT_RGB24>},
+        {AV_PIX_FMT_RGB48LE, convert_rgb_to_inter<uint16_t, 0, false, AV_PIX_FMT_RGB48LE>},
 
-        {AV_PIX_FMT_RGBA64LE, convert_rgb_to_inter<uint16_t, 0, true, false>},
-        {AV_PIX_FMT_RGBA, convert_rgb_to_inter<uint8_t, 8, true, false>},
+        {AV_PIX_FMT_RGBA64LE, convert_rgb_to_inter<uint16_t, 0, true, AV_PIX_FMT_RGBA64LE>},
+        {AV_PIX_FMT_RGBA, convert_rgb_to_inter<uint8_t, 8, true, AV_PIX_FMT_RGBA>},
 
         {AV_PIX_FMT_Y210, convert_y210_to_inter}, //idk how to test these
 #if P210_PRESENT
@@ -1249,6 +1254,9 @@ const std::map<int, int (*) (const AVFrame *, char *, AVFrame *)> conversions_to
 #if VUYX_PRESENT
         {AV_PIX_FMT_VUYA, convert_yuva_to_inter<true>}, //idk how to test these
         {AV_PIX_FMT_VUYX, convert_yuva_to_inter<false>} //idk how to test these
+#endif
+#if X2RGB10LE_PRESENT
+        {AV_PIX_FMT_X2RGB10LE, convert_rgb_to_inter<uint8_t, 0, true, AV_PIX_FMT_X2RGB10LE>}, //shift doesnt matter
 #endif
 };
 
