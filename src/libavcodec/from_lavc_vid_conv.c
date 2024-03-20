@@ -2188,7 +2188,8 @@ struct av_to_uv_convert_state {
         codec_t src_pixfmt;
         codec_t dst_pixfmt;
         decoder_t dec;
-        struct from_lavc_conv_state *cuda_conv_state;
+        bool cuda_need_to_init;
+        from_lavc_conv_state *cuda_conv_state;
 };
 
 struct av_to_uv_conversion {
@@ -2382,7 +2383,8 @@ av_to_uv_conversion_destroy(av_to_uv_convert_t **s)
         if (s == NULL || *s == NULL) {
                 return;
         }
-        av_to_uv_conversion_cuda_destroy(&(*s)->cuda_conv_state);
+        if ((*s)->cuda_conv_state != NULL)
+                av_to_uv_conversion_cuda_destroy(&(*s)->cuda_conv_state);
         free(*s);
         *s = NULL;
 }
@@ -2390,20 +2392,21 @@ av_to_uv_conversion_destroy(av_to_uv_convert_t **s)
 static bool
 cuda_conv_enabled()
 {
+        // return false;
 #ifdef TEST_CONVERSIONS
         bool cuda_devices_explicit = false;
 #endif
         if (!cuda_devices_explicit) {
                 return false;
         }
-        AVFrame f;
-        f.format = AV_PIX_FMT_UYVY422;
-        struct from_lavc_conv_state *s =
-            av_to_uv_conversion_cuda_init(&f, UYVY);
-        if (s == NULL) {
-                return false;
-        }
-        av_to_uv_conversion_cuda_destroy(&s);
+        // AVFrame f;
+        // f.format = AV_PIX_FMT_UYVY422;
+        // from_lavc_conv_state *s =
+        //     av_to_uv_conversion_cuda_init(&f, UYVY);
+        // if (s == NULL) {
+        //         return false;
+        // }
+        // av_to_uv_conversion_cuda_destroy(&s);
         return true;
 }
 
@@ -2426,18 +2429,16 @@ get_first_supported_cuda(const enum AVPixelFormat *fmts)
 av_to_uv_convert_t *get_av_to_uv_conversion(int av_codec, codec_t uv_codec) {
         av_to_uv_convert_t *ret = calloc(1, sizeof *ret);
         ret->dst_pixfmt = uv_codec;
+        ret->cuda_need_to_init = false;
 
         if (cuda_conv_enabled()) {
                 enum AVPixelFormat f[2] = { av_codec, AV_PIX_FMT_NONE };
-                from_lavc_conv_state *s;
-                if ((s = av_to_uv_conversion_cuda_init(f, uv_codec)) != NULL) {
-                        ret->cuda_conv_state = s;
-                        if (ret->cuda_conv_state != NULL) {
-                                MSG(NOTICE, "Using CUDA FFmpeg conversions.\n");
-                                return ret;
-                        }
-                        MSG(ERROR, "Unable to initialize CUDA conv state!\n");
+                if (get_first_supported_cuda(f) != AV_PIX_FMT_NONE) {
+                        ret->cuda_need_to_init = true;
+                        MSG(NOTICE, "Using CUDA FFmpeg conversions.\n");
+                        return ret;
                 }
+                MSG(ERROR, "Unable to initialize CUDA conv state!\n");
         }
 
         codec_t mapped_pix_fmt = get_av_to_ug_pixfmt(av_codec);
@@ -2693,12 +2694,19 @@ convert_task(void *arg)
 }
 
 void
-av_to_uv_convert(const av_to_uv_convert_t *convert,
+av_to_uv_convert(av_to_uv_convert_t *convert,
                  char *dst, AVFrame *in, int width, int height, int pitch,
                  const int rgb_shift[3])
 {
-        if (convert->cuda_conv_state != NULL) {
-                dst = av_to_uv_convert_cuda(convert->cuda_conv_state, in);
+        if (convert->cuda_need_to_init){
+                in->width = width;
+                in->height = height;
+                convert->cuda_conv_state = av_to_uv_conversion_cuda_init(in, convert->dst_pixfmt); //have to init here because of the api
+                convert->cuda_need_to_init = false;
+        }
+
+        if ( convert->cuda_conv_state != NULL) {
+                av_to_uv_convert_cuda(convert->cuda_conv_state, in, dst);
                 return;
         }
 

@@ -66,7 +66,6 @@ static const enum AVPixelFormat from_lavc_cuda_supp_formats[] = {
 };
 
 typedef struct {
-    char * ptr;
     codec_t to;
     char *intermediate;
     char *gpu_out_buffer;
@@ -77,16 +76,15 @@ typedef struct {
 // #define HAVE_CUDA
 #ifdef HAVE_CUDA
 
-char *av_to_uv_convert_cuda(from_lavc_conv_state *state, const AVFrame* frame);
+void av_to_uv_convert_cuda(from_lavc_conv_state *state, const AVFrame* frame, char *dst);
 
  from_lavc_conv_state *av_to_uv_conversion_cuda_init(const AVFrame*, codec_t);
 
 void av_to_uv_conversion_cuda_destroy(from_lavc_conv_state **);
 #else
 
-char * av_to_uv_convert_cuda(from_lavc_conv_state *state,  const AVFrame* frame){
-    (void) state; (void) frame;
-    return NULL;
+void  av_to_uv_convert_cuda(from_lavc_conv_state *state,  const AVFrame* frame, char * dst){
+    (void) state; (void) frame; (void) dst;
 }
 
 from_lavc_conv_state *av_to_uv_conversion_cuda_init(const AVFrame *f, codec_t c){

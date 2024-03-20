@@ -1054,7 +1054,7 @@ const std::map<AVPixelFormat, std::tuple<int, void (*)(int, int, char *, AVFrame
 /*                                              INTERFACE                                                     */
 /**************************************************************************************************************/
 
-AVFrame *to_lavc_vid_conv_cuda(to_lavc_conv_cuda* state, const char *src) {
+extern "C" AVFrame *to_lavc_vid_conv_cuda(to_lavc_conv_cuda* state, const char *src) {
     auto internal_frame = state->frame;
     auto UG_codec = state->to;
     auto gpu_in_buffer = state->gpu_in_buffer;
@@ -1112,7 +1112,7 @@ void free_host_AVFrame(AVFrame *f){
         cudaFreeHost(f->data[i]);
 }
 
-to_lavc_conv_cuda *to_lavc_vid_conv_cuda_init(AVPixelFormat AV_codec, codec_t UG_codec, int width, int height){
+extern "C" to_lavc_conv_cuda *to_lavc_vid_conv_cuda_init(AVPixelFormat AV_codec, codec_t UG_codec, int width, int height){
     char *intermediate_to;
     char *gpu_in_buffer;
     AVFrame *gpu_frame;
@@ -1120,7 +1120,7 @@ to_lavc_conv_cuda *to_lavc_vid_conv_cuda_init(AVPixelFormat AV_codec, codec_t UG
 
     if (conversions_from_inter.find(AV_codec) == conversions_from_inter.end()
         || conversions_to_rgb_inter.find(UG_codec) == conversions_to_rgb_inter.end()){ //both should contain same keys
-        return nullptr;
+        return NULL;
     }
 
     cudaMalloc(&intermediate_to, vc_get_datalen(width, height, Y416));
@@ -1143,7 +1143,7 @@ to_lavc_conv_cuda *to_lavc_vid_conv_cuda_init(AVPixelFormat AV_codec, codec_t UG
     return ret;
 }
 
-void to_lavc_vid_conv_cuda_destroy(to_lavc_conv_cuda **s){
+extern "C" void to_lavc_vid_conv_cuda_destroy(to_lavc_conv_cuda **s){
     auto state = *s;
 
     cudaFree(state->intermediate_to);

@@ -1294,8 +1294,7 @@ const std::map<int, void (*) (const AVFrame *, char *, char *)> conversions_from
 /*                                              INTERFACE                                                     */
 /**************************************************************************************************************/
 
-extern "C" char *av_to_uv_convert_cuda(from_lavc_conv_state *state, const AVFrame* frame) {
-    auto dst = state->ptr;
+extern "C" void av_to_uv_convert_cuda(from_lavc_conv_state *state, const AVFrame* frame, char *dst) {
     auto to = state->to;
 
     copy_to_device(state->wrapper, frame);
@@ -1317,16 +1316,13 @@ extern "C" char *av_to_uv_convert_cuda(from_lavc_conv_state *state, const AVFram
     }
     //copy the converted image back to the host
     cudaMemcpy(dst, state->gpu_out_buffer, vc_get_datalen(frame->width, frame->height, to), cudaMemcpyDeviceToHost);
-    return dst;
 }
 
 extern "C" from_lavc_conv_state *av_to_uv_conversion_cuda_init(const AVFrame *frame, codec_t out){
-    char *dst_ptr;
     char *intermediate;
     char *gpu_out_buffer;
     AVF_GPU_wrapper *wrapper;
     AVFrame *gpu_frame;
-
 
     if ( frame == nullptr || conversions_to_inter.find(frame->format) == conversions_to_inter.end()
          || conversions_from_rgb_inter.find(out) == conversions_from_rgb_inter.end()){ //both should contain same keys
@@ -1336,26 +1332,23 @@ extern "C" from_lavc_conv_state *av_to_uv_conversion_cuda_init(const AVFrame *fr
     cudaMalloc(&intermediate, vc_get_datalen(frame->width, frame->height, Y416));
     cudaMalloc(&gpu_out_buffer, vc_get_datalen(frame->width, frame->height, out));
     cudaMalloc(&gpu_frame, sizeof(AVFrame));
-    cudaMallocHost(&dst_ptr, vc_get_datalen(frame->width, frame->height, out));
     wrapper = (AVF_GPU_wrapper *) malloc(sizeof(AVF_GPU_wrapper));
 
     alloc(wrapper, frame);
     
     auto ret = (from_lavc_conv_state *) malloc(sizeof(from_lavc_conv_state));
-    *ret = {dst_ptr, out, intermediate, gpu_out_buffer, wrapper, gpu_frame};
+    *ret = { out, intermediate, gpu_out_buffer, wrapper, gpu_frame};
     return ret;
 }
 
 extern "C" void av_to_uv_conversion_cuda_destroy(from_lavc_conv_state **s){
     auto state = *s;
-    cudaFreeHost(state->ptr);
     cudaFree(state->intermediate);
     cudaFree(state->gpu_out_buffer);
     cudaFree(state->gpu_frame);
     free_from_device(state->wrapper);
     free(state->wrapper);
 
-    state->ptr = nullptr;
     state->intermediate = nullptr;
     state->wrapper = nullptr;
     state->gpu_out_buffer = nullptr;

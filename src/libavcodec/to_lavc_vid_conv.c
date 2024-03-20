@@ -1571,9 +1571,7 @@ set_convertible_formats_cuda(codec_t in_codec, struct to_lavc_req_prop req_prop,
                              int fmt_set[static AV_PIX_FMT_NB],
                              struct lavc_compare_convs_data *comp_data)
 {
-        for (unsigned i = 0; i < sizeof to_lavc_cuda_supp_formats /
-                                     sizeof to_lavc_cuda_supp_formats[0];
-             i++) {
+        for (unsigned i = 0; to_lavc_cuda_supp_formats[i] != AV_PIX_FMT_NONE; i++) {
                 const enum AVPixelFormat f = to_lavc_cuda_supp_formats[i];
                 if (!filter(&req_prop, in_codec, f)) {
                         continue;
@@ -1591,6 +1589,7 @@ set_convertible_formats_cuda(codec_t in_codec, struct to_lavc_req_prop req_prop,
 static bool
 cuda_conv_enabled()
 {
+        // return false;
 #ifdef TEST_CONVERSIONS
         bool cuda_devices_explicit = false;
 #endif
@@ -1676,21 +1675,19 @@ static void to_lavc_memcpy_data(AVFrame * __restrict out_frame, const unsigned c
 }
 
 struct to_lavc_vid_conv *to_lavc_vid_conv_init(codec_t in_pixfmt, int width, int height, enum AVPixelFormat out_pixfmt, int thread_count) {
-        struct to_lavc_vid_conv *s = (struct to_lavc_vid_conv *) calloc(1, sizeof *s);
+        struct to_lavc_vid_conv *s = (struct to_lavc_vid_conv *) calloc(1, sizeof(struct to_lavc_vid_conv));
         s->in_pixfmt = in_pixfmt;
         s->thread_count = thread_count;
         s->out_frame_parts = (struct AVFrame **) calloc(thread_count, sizeof *s->out_frame_parts);
-
         if (cuda_conv_enabled()) {
-                s->cuda_conv_state = to_lavc_vid_conv_cuda_init(
-                        in_pixfmt, out_pixfmt, width, height);
+                s->cuda_conv_state = to_lavc_vid_conv_cuda_init(out_pixfmt,in_pixfmt, width, height);
                 if (s->cuda_conv_state != NULL) {
                         MSG(NOTICE, "Using CUDA FFmpeg conversions.\n");
                         return s;
                 }
                 MSG(ERROR, "Unable to initialize CUDA conv state!\n");
         }
-
+        
         int ret = 0;
         for (int i = 0; i < thread_count; i++) {
                 s->out_frame_parts[i] = av_frame_alloc();
@@ -1876,10 +1873,11 @@ struct AVFrame *to_lavc_vid_conv(struct to_lavc_vid_conv *s, char *in_data) {
 
 void to_lavc_vid_conv_destroy(struct to_lavc_vid_conv **s_p) {
         struct to_lavc_vid_conv *s = *s_p;
+        if (s == NULL) {
+                return;
+        }
         if (s->cuda_conv_state != NULL) {
                 to_lavc_vid_conv_cuda_destroy(&s->cuda_conv_state);
-        }
-        if (s == NULL) {
                 return;
         }
         for (int i = 0; i < s->thread_count; i++) {
