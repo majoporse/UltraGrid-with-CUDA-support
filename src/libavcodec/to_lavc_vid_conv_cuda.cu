@@ -142,10 +142,10 @@ __global__ void convert_rgb_from_inter(int width, int height, size_t pitch_in, c
         *dst++ = src[1] >> bit_shift;//G
         *dst++ = src[0] >> bit_shift;//R
     } else if constexpr (CODEC == AV_PIX_FMT_X2RGB10LE){
-        *dst++ = (src[0] >> 10U); // [2x r<6]
-        *dst++ = (((src[0] >> 6U) & 0xFU) << 4U) | (src[1] >> 12U); // R[->4] | G[<-4]
-        *dst++ = (((src[1] >> 6U) & 0x3FU) << 2U) | (src[2] >> 14U); // G[->6] | B[<-2]
         *dst++ = src[2] >> 6U; //B[->8]
+        *dst++ = (((src[1] >> 6U) & 0x3FU) << 2U) | (src[2] >> 14U); // G[->6] | B[<-2]
+        *dst++ = (((src[0] >> 6U) & 0xFU) << 4U) | (src[1] >> 12U); // R[->4] | G[<-4]
+        *dst++ = (src[0] >> 10U); // [2x r<6]
     } else{
         *dst++ = *src++ >> bit_shift;
         *dst++ = *src++ >> bit_shift;

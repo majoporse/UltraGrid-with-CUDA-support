@@ -777,9 +777,9 @@ __global__ void rgb_to_intermediate(char * __restrict dst_buffer, size_t pitch, 
         *dst++ = src[0] << bit_shift;//R
     } else if (CODEC == AV_PIX_FMT_X2RGB10LE){
         // [2X R6] [R4 G4] [G6 B2] [B8]
-        dst[0] = (src[0] << 10U) | ((src[1] & 0xF0U) << 2U); //R
-        dst[1] = ((src[1] & 0xFU) << 12U) | ((src[2] & 0b11111100) << 4U); //G
-        dst[2] = ((src[2] & 0x3U) << 14U) | (src[3] << 6U); //B
+        dst[0] = (src[3] << 10U) | ((src[2] & 0xF0U) << 2U); //R
+        dst[1] = ((src[2] & 0xFU) << 12U) | ((src[1] & 0b11111100) << 4U); //G
+        dst[2] = ((src[1] & 0x3U) << 14U) | (src[0] << 6U); //B
     } else {
         dst[0] = src[0] << bit_shift;
         dst[1] = src[1] << bit_shift;

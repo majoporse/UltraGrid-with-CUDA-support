@@ -72,6 +72,8 @@
 #define BYTE_SWAP(x) x
 #endif
 
+
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunknown-pragmas"
 #pragma clang diagnostic warning "-Wpass-failed"
@@ -1589,6 +1591,9 @@ set_convertible_formats_cuda(codec_t in_codec, struct to_lavc_req_prop req_prop,
 static bool
 cuda_conv_enabled()
 {
+#ifdef TEST_CONVERSIONS
+        bool cuda_devices_explicit = false;
+#endif
         if (!cuda_devices_explicit) {
                 return false;
         }

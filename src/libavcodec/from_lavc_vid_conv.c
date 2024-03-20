@@ -2375,7 +2375,7 @@ static decoder_t get_av_and_uv_conversion(enum AVPixelFormat av_codec, codec_t u
         }
         return NULL;
 }
-bool cuda_devices_explicit = false;
+
 void
 av_to_uv_conversion_destroy(av_to_uv_convert_t **s)
 {
@@ -2390,6 +2390,9 @@ av_to_uv_conversion_destroy(av_to_uv_convert_t **s)
 static bool
 cuda_conv_enabled()
 {
+#ifdef TEST_CONVERSIONS
+        bool cuda_devices_explicit = false;
+#endif
         if (!cuda_devices_explicit) {
                 return false;
         }
