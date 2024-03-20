@@ -15,7 +15,6 @@
 #include "../libavcodec/lavc_common.h"
 #include "../video_codec.h"
 #include "cuda_utils.h"
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -97,22 +96,20 @@ void to_lavc_vid_conv_cuda_destroy(to_lavc_conv_cuda **);
 #else
 #include <stdio.h>
 
-struct to_lavc_conv_cuda{};
-
-struct to_lavc_conv_cuda *to_lavc_vid_conv_cuda_init(enum AVPixelFormat f, codec_t c, int w, int h)
+to_lavc_conv_cuda *to_lavc_vid_conv_cuda_init(enum AVPixelFormat f, codec_t c, int w, int h)
 {
     (void) f, (void) c, (void) w, (void) h;
     fprintf(stderr, "ERROR: CUDA support not compiled in!\n");
     return NULL;
 }
 
-AVFrame *to_lavc_vid_conv_cuda(struct to_lavc_conv_cuda s, const char* p)
+AVFrame *to_lavc_vid_conv_cuda(to_lavc_conv_cuda *s, const char* p)
 {
     (void) s, (void) p;
     return NULL;
 }
 
-void to_lavc_vid_conv_cuda_destroy(struct to_lavc_vid_conv_cuda **state)
+void to_lavc_vid_conv_cuda_destroy(to_lavc_conv_cuda **state)
 {
     (void) state;
 }

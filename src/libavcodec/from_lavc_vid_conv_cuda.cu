@@ -1361,3 +1361,4 @@ extern "C" void av_to_uv_conversion_cuda_destroy(from_lavc_conv_state **s){
     state->gpu_out_buffer = nullptr;
     free(state);
 }
+// #endif
