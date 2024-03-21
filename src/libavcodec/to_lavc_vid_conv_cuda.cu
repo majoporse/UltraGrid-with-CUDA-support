@@ -1032,7 +1032,7 @@ const std::map<AVPixelFormat, std::tuple<int, void (*)(int, int, char *, AVFrame
         {AV_PIX_FMT_RGBA, {RGB_INTER_TO, rgb_from_inter<uint8_t, 8, true, AV_PIX_FMT_RGBA>}},
 
 #if Y210_PRESENT
-        {AV_PIX_FMT_Y210, {YUV_INTER_TO, y210_form_inter}},
+        {AV_PIX_FMT_Y210, {YUV_INTER_TO, y210_from_inter}},
 #endif
 #if P210_PRESENT
         {AV_PIX_FMT_P210LE, {YUV_INTER_TO, p210_from_inter}},
