@@ -87,7 +87,7 @@ typedef struct {
 } to_lavc_conv_cuda;
 
 // #define HAVE_CUDA
-#ifdef HAVE_CUDA
+#ifdef HAVE_LAVC_CUDA_CONV
 
 AVFrame *to_lavc_vid_conv_cuda(to_lavc_conv_cuda *, const char *src);
 

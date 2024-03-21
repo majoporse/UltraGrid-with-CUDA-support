@@ -9,15 +9,15 @@ vpath %.cu $(SRCDIR) $(SRCDIR)/tools
 
 %.o : %.c
 	$(MKDIR_P) $(dir $@)
-	$(CC) -D HAVE_CUDA=1 -D TEST_CONVERSIONS=1 $(COMMON_FLAGS) -c $< -o $@
+	$(CC) -D HAVE_LAVC_CUDA_CONV=1 -D TEST_CONVERSIONS=1 $(COMMON_FLAGS) -c $< -o $@
 
 %.o : %.cpp
 	$(MKDIR_P) $(dir $@)
-	$(CXX) -D HAVE_CUDA=1 -D TEST_CONVERSIONS=1 -std=c++17 $(COMMON_FLAGS) -c $< -o $@
+	$(CXX) -D HAVE_LAVC_CUDA_CONV=1 -D TEST_CONVERSIONS=1 -std=c++17 $(COMMON_FLAGS) -c $< -o $@
 
 %.o : %.cu
 	$(MKDIR_P) $(dir $@)
-	$(CUDA_CXX) -D HAVE_CUDA=1 -D TEST_CONVERSIONS=1 -std c++20 $(COMMON_FLAGS) -c $< -o $@  -lavutil -lavcodec -lswscale
+	$(CUDA_CXX) -D HAVE_LAVC_CUDA_CONV=1 -D TEST_CONVERSIONS=1 -std c++20 $(COMMON_FLAGS) -c $< -o $@  -lavutil -lavcodec -lswscale
 
 
 astat_test: astat.cpp src/compat/platform_pipe.o

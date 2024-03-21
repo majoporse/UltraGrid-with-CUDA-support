@@ -77,7 +77,7 @@ typedef struct {
 } from_lavc_conv_state;
 
 // #define HAVE_CUDA
-#ifdef HAVE_CUDA
+#ifdef HAVE_LAVC_CUDA_CONV
 
 void av_to_uv_convert_cuda(from_lavc_conv_state *state, const AVFrame* frame, char *dst);
 
