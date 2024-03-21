@@ -1660,8 +1660,7 @@ struct to_lavc_vid_conv {
 static void to_lavc_memcpy_data(AVFrame * __restrict out_frame, const unsigned char * __restrict in_data, int width, int height)
 {
         struct to_lavc_vid_conv *s = out_frame->opaque;
-        size_t linesize = vc_get_linesize(width, s->decoded_codec);
-        size_t linelength = vc_get_size(width, s->decoded_codec);
+        
         for (int comp = 0; comp < AV_NUM_DATA_POINTERS; ++comp) {
                 if (out_frame->linesize[comp] == 0) {
                         break;
