@@ -41,7 +41,6 @@ int main(int argc, char *argv[]){
     size_t in_size = vc_get_datalen(width, height, RGB);
     std::vector<unsigned char> fin_data(in_size);
     fin.read(reinterpret_cast<char *>(fin_data.data()), in_size);
-//    for(auto& a: fin_data){ a = (rand() + 1) % 254; }
 
     //RGB -> RG48 because it has conversion to every UG format
     std::vector<unsigned char> rg48vec(vc_get_datalen(width, height, RG48));
@@ -73,7 +72,7 @@ int main(int argc, char *argv[]){
     //convert UG -> AV
     //-------------------------------------------gpu version
     AVFrame *frame1 = nullptr;
-    char *dst_cpu1 = nullptr;
+    std::vector<char> dst_cpu1(vc_get_datalen(width, height, RGB));
     float count_gpu = 0;
     from_lavc_conv_state *from_state1;
     auto state = to_lavc_vid_conv_cuda_init(AV_codec, UG_codec, width, height);
@@ -89,8 +88,8 @@ int main(int argc, char *argv[]){
         }
         count_gpu /= 100.0;
         from_state1 = av_to_uv_conversion_cuda_init(frame1, RGB);
-        if (from_state1->ptr){
-            dst_cpu1 = av_to_uv_convert_cuda(from_state1, frame1);
+        if (from_state1){
+            av_to_uv_convert_cuda(from_state1, frame1, dst_cpu1.data());
         }
 
     } else {
@@ -100,7 +99,8 @@ int main(int argc, char *argv[]){
     //-------------------------------------------cpu version
     float count = 0;
     int max = 0;
-    char * dst_cpu2;
+    std::vector<char> dst_cpu2(vc_get_datalen(width, height, RGB));
+
     struct to_lavc_vid_conv *conv_to_av = to_lavc_vid_conv_init(UG_codec, width, height, AV_codec, 1);
     from_lavc_conv_state *from_state2;
     if (conv_to_av){
@@ -117,13 +117,13 @@ int main(int argc, char *argv[]){
         frame2->width = width;
         frame2->height = height;
         from_state2 = av_to_uv_conversion_cuda_init(frame2, RGB);
-        if (from_state2->ptr){
+        if (from_state2){
 
-            dst_cpu2 = av_to_uv_convert_cuda(from_state2, frame2);
+            av_to_uv_convert_cuda(from_state2, frame2, dst_cpu2.data());
 
             uint8_t *f1, *f2;
-            f1 = (uint8_t *)dst_cpu1;
-            f2 = (uint8_t *)dst_cpu2;
+            f1 = (uint8_t *)dst_cpu1.data();
+            f2 = (uint8_t *)dst_cpu2.data();
             for(int i = 0; i < vc_get_datalen(width, height, RGB); ++i) {
                 max = std::max(std::abs( f1[i] - f2[i]), max);
             }
@@ -137,8 +137,8 @@ int main(int argc, char *argv[]){
 
     //--------------------------------
 
-    fout1.write(dst_cpu1, vc_get_datalen(width, height, RGB));
-    reference.write(dst_cpu2, vc_get_datalen(width, height, RGB));
+    fout1.write(dst_cpu1.data(), vc_get_datalen(width, height, RGB));
+    reference.write(dst_cpu2.data(), vc_get_datalen(width, height, RGB));
 
     //print time
     std::cout << "gpu implementation time: " << std::fixed  << std::setprecision(10) << count_gpu << "ms\n"

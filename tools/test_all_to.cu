@@ -232,10 +232,10 @@ int main(int argc, char *argv[]){
     std::vector<unsigned char> fin_data(in_size);
 
     std::filesystem::path p{argv[3]};
-    if (std::filesystem::file_size(p) != in_size){
-        std::cout << "wrong file size! make sure its 16 bit rgb!!\n";
-        return 1;
-    }
+    // if (std::filesystem::file_size(p) != in_size){
+    //     std::cout << "wrong file size! make sure its 16 bit rgb!!\n";
+    //     return 1;
+    // }
 
     fin.read(reinterpret_cast<char *>(fin_data.data()), in_size);
 //    std::ranges::for_each(fin_data, [](auto &a){a = rand();});

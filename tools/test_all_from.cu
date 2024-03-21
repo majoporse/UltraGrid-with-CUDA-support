@@ -231,12 +231,9 @@ void benchmark(AVFrame *f1, AVPixelFormat AV_format, codec_t UG_format, std::ofs
 
 
     //---------------------------------------gpu implementation
-    char *dst_cpu = nullptr;
+    std::vector<char>dst_cpu(vc_get_datalen(width, height, UG_format));
     auto state = av_to_uv_conversion_cuda_init(converted, UG_format);
 
-    if (!state->ptr){
-        return;
-    }
 
     // timing
     cudaEvent_t start, stop;
@@ -246,7 +243,7 @@ void benchmark(AVFrame *f1, AVPixelFormat AV_format, codec_t UG_format, std::ofs
     float count_gpu = 0;
     for (int i = 0; i < 10; ++i){
         cudaEventRecord(start, 0);
-        dst_cpu = av_to_uv_convert_cuda(state, converted);
+        av_to_uv_convert_cuda(state, converted, dst_cpu.data());
         cudaEventRecord(stop, 0);
         cudaEventSynchronize(stop);
         float time;
@@ -257,7 +254,7 @@ void benchmark(AVFrame *f1, AVPixelFormat AV_format, codec_t UG_format, std::ofs
 
     logs << av_get_pix_fmt_name(AV_format) << " --> "
          << get_codec_name(UG_format) << "\n";
-    check((uint8_t *) dst_cpu,(uint8_t *) reference_vec.data(), width, height, UG_format, logs);
+    check((uint8_t *) dst_cpu.data(),(uint8_t *) reference_vec.data(), width, height, UG_format, logs);
 
     logs << "gpu implementation time: " << std::fixed  << std::setprecision(10) << count_gpu << "ms\n"
          << "cpu implementation time: " << std::fixed  << std::setprecision(10) << count / 1000'000.0<< "ms\n"
@@ -270,7 +267,6 @@ void benchmark(AVFrame *f1, AVPixelFormat AV_format, codec_t UG_format, std::ofs
     av_to_uv_conversion_cuda_destroy(&state);
     cudaEventDestroy(start);
     cudaEventDestroy(stop);
-
 }
 
 int main(int argc, char *argv[]){

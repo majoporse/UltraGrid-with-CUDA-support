@@ -70,8 +70,8 @@ int main(int argc, char *argv[]){
     assert(in_codec != AV_PIX_FMT_NONE && out_codec != VIDEO_CODEC_NONE);
 
     std::ifstream fin(argv[3], std::ifstream::binary);
-    std::ofstream fout1(std::string{"test_out."} + argv[5], std::ofstream::binary);
-    std::ofstream reference(std::string{"reference."} + argv[5], std::ofstream::binary);
+    std::ofstream fout1(std::string{"UG_test."} + argv[5], std::ofstream::binary);
+    std::ofstream reference(std::string{"UG_reference."} + argv[5], std::ofstream::binary);
     assert (width && height && fin && fout1 && reference);
 
     size_t in_size = vc_get_datalen(width, height, RGBA);
@@ -94,7 +94,7 @@ int main(int argc, char *argv[]){
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
 
-    char *dst_cpu = nullptr;
+    char *dst_cpu = (char *) malloc(vc_get_datalen(width, height, out_codec));
     auto state = av_to_uv_conversion_cuda_init(converted, out_codec);
     if (!state)
         return -1;
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]){
     float count_gpu = 0;
     for (int i = 0; i < 100; ++i){
         cudaEventRecord(start, 0);
-        dst_cpu = av_to_uv_convert_cuda(state, converted);
+        av_to_uv_convert_cuda(state, converted, dst_cpu);
         cudaEventRecord(stop, 0);
         cudaEventSynchronize(stop);
         float time;
@@ -150,6 +150,7 @@ int main(int argc, char *argv[]){
 
     av_frame_free(&converted);
     av_frame_free(&frame);
+    free(dst_cpu);
 }
 //if profile wanted run: sudo /usr/local/cuda/bin/nsys nvprof  ./test_from 7680 4320 in8k.rgb yuv444p10le rgb
 
