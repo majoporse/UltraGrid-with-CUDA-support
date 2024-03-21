@@ -2392,7 +2392,6 @@ av_to_uv_conversion_destroy(av_to_uv_convert_t **s)
 static bool
 cuda_conv_enabled()
 {
-        // return false;
 #ifdef TEST_CONVERSIONS
         bool cuda_devices_explicit = false;
 #endif

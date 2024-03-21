@@ -1589,7 +1589,6 @@ set_convertible_formats_cuda(codec_t in_codec, struct to_lavc_req_prop req_prop,
 static bool
 cuda_conv_enabled()
 {
-        // return false;
 #ifdef TEST_CONVERSIONS
         bool cuda_devices_explicit = false;
 #endif
