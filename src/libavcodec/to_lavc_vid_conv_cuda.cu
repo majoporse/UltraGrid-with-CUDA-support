@@ -919,7 +919,7 @@ void p010le_from_inter(int width, int height, char *intermediate_to, AVFrame *ds
 }
 
 template<bool b>
-void vuya_form_inter(int width, int height, char *intermediate_to, AVFrame *dst_frame){
+void vuya_from_inter(int width, int height, char *intermediate_to, AVFrame *dst_frame){
 
     size_t pitch_in = vc_get_linesize(width, Y416);
 
@@ -928,7 +928,7 @@ void vuya_form_inter(int width, int height, char *intermediate_to, AVFrame *dst_
     convert_vuya_from_inter<b><<<grid, block>>>(width, height, pitch_in, intermediate_to, dst_frame);
 }
 
-void y210_form_inter(int width, int height, char *intermediate_to, AVFrame *dst_frame){
+void y210_from_inter(int width, int height, char *intermediate_to, AVFrame *dst_frame){
 
     size_t pitch_in = vc_get_linesize(width, Y416);
 
@@ -1038,8 +1038,8 @@ const std::map<AVPixelFormat, std::tuple<int, void (*)(int, int, char *, AVFrame
         {AV_PIX_FMT_P210LE, {YUV_INTER_TO, p210_from_inter}},
 #endif
 #if XV3X_PRESENT
-        {AV_PIX_FMT_XV30, {YUV_INTER_TO, y210_form_inter}}, //idk how to test these
-        {AV_PIX_FMT_Y212, {YUV_INTER_TO, y210_form_inter}}, //idk how to test these
+        {AV_PIX_FMT_XV30, {YUV_INTER_TO, y210_from_inter}}, //idk how to test these
+        {AV_PIX_FMT_Y212, {YUV_INTER_TO, y210_from_inter}}, //idk how to test these
 #endif
 #if VUYX_PRESENT
         {AV_PIX_FMT_VUYA, {YUV_INTER_TO, vuya_from_inter<true>}}, //idk how to test these
