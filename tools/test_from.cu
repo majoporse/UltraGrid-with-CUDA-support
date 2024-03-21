@@ -74,16 +74,16 @@ int main(int argc, char *argv[]){
     std::ofstream reference(std::string{"UG_reference."} + argv[5], std::ofstream::binary);
     assert (width && height && fin && fout1 && reference);
 
-    size_t in_size = vc_get_datalen(width, height, RGBA);
+    size_t in_size = vc_get_datalen(width, height, RGB);
     std::vector<char> fin_data(in_size);
     fin.read(fin_data.data(), in_size);
 
 
     //RGB -> avframe
-    AVFrame *frame = get_avframe(width, height, AV_PIX_FMT_RGBA);
+    AVFrame *frame = get_avframe(width, height, AV_PIX_FMT_RGB24);
 
     av_image_fill_arrays(frame->data, frame->linesize, reinterpret_cast<const uint8_t *>(fin_data.data()),
-                         AV_PIX_FMT_RGBA, width, height, 1);
+                         AV_PIX_FMT_RGB24, width, height, 1);
 
     //avframe in converted codec
     AVFrame *converted = get_avframe(width, height, in_codec);
