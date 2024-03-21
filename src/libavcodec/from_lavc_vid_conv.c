@@ -1835,7 +1835,7 @@ static void p210le_to_uyvy(char * __restrict dst_buffer, AVFrame * __restrict in
                 uint8_t *dst = (uint8_t *)(void *)(dst_buffer + y * pitch);
 
                 OPTIMIZED_FOR (int x = 0; x < width / 2; ++x) {
-                        *dst = *src_cbcr++ >> 8;
+                        *dst++ = *src_cbcr++ >> 8;
                         *dst++ = *src_y++ >> 8;
                         *dst++ = *src_cbcr++ >> 8;
                         *dst++ = *src_y++ >> 8;
@@ -1885,11 +1885,11 @@ static void xv30_to_v210(char * __restrict dst_buffer, AVFrame * __restrict in_f
 #define FETCH_IN \
                 in0 = *src++; \
                 in1 = *src++; \
-                u = ((in0 & 0x3FFU) + (in1 & 0x3FFU) + 1) >> 1; \
+                u = ((in0 & 0x3FFU) + (in1 & 0x3FFU)) >> 1; \
                 y0 = (in0 >> 10U) & 0x3FFU; \
-                v = ((in0 >> 20U & 0x3FFU) + ((in1 >> 20U & 0x3FFU) + 1)) >> 1; \
+                v = ((in0 >> 20U & 0x3FFU) + ((in1 >> 20U & 0x3FFU))) >> 1; \
                 y1 = (in1 >> 10U) & 0x3FFU; \
-
+                        // xV Y0 U|xY2 U Y1|xU Y3 V|xY5 V Y4
                 OPTIMIZED_FOR (int x = 0; x < width / 6; ++x) {
                         uint32_t in0, in1;
                         uint32_t u, y0, v, y1;

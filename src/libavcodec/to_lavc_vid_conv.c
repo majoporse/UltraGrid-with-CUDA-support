@@ -470,16 +470,17 @@ static void v210_to_xv30(AVFrame * __restrict out_frame, const unsigned char * _
                 uint32_t *dst = (uint32_t *)(void *) (out_frame->data[0] + out_frame->linesize[0] * y);
 
                 OPTIMIZED_FOR (int x = 0; x < (width + 5) / 6; ++x) {
+                        // xV Y0 U|xY2 U Y1|xU Y3 V|xY5 V Y4
                         uint32_t w0 = *src++;
                         uint32_t w1 = *src++;
                         uint32_t w2 = *src++;
                         uint32_t w3 = *src++;
                         *dst++ = w0;
-                        *dst++ = (w0 & 0xFFF003FFU) | (w1 & 0x3FFU) << 10U;
-
+                        *dst++ = (w0 & 0x3FF003FFU) | (w1 & 0x3FFU) << 10U;
                         *dst++ = (w2 & 0x3FFU) << 20U | (w1 & 0x3FF00000U) >> 10U | (w1 & 0xFFC00U) >> 10U;
                         *dst++ = (w2 & 0x3FFU) << 20U | (w2 & 0xFFC00U) | (w1 & 0xFFC00U) >> 10U;
 
+                                //      V                       Y4                           U
                         *dst++ = (w3 & 0xFFC00U) << 10U | (w3 & 0x3FFU) << 10U | (w2 & 0x3FF00000U) >> 20;
                         *dst++ = (w3 & 0xFFC00U) << 10U | (w3 & 0x3FF00000U) >> 10 | (w2 & 0x3FF00000U) >> 20;
                 }
@@ -534,9 +535,8 @@ static void y416_to_xv30(AVFrame * __restrict out_frame, const unsigned char * _
                         unsigned u = *src++;
                         unsigned y = *src++;
                         unsigned v = *src++;
-                        unsigned a = *src++;
-                        *dst++ = (a >> 14U) << 30U |
-                                (v >> 6U) << 20U |
+                        src++;
+                        *dst++ = (v >> 6U) << 20U |
                                 (y >> 6U) << 10U |
                                 (u >> 6U);
                 }
@@ -1663,12 +1663,11 @@ static void to_lavc_memcpy_data(AVFrame * __restrict out_frame, const unsigned c
         size_t linesize = vc_get_linesize(width, s->decoded_codec);
         size_t linelength = vc_get_size(width, s->decoded_codec);
         for (int comp = 0; comp < AV_NUM_DATA_POINTERS; ++comp) {
-                if (out_frame->data[comp] == NULL) {
+                if (out_frame->linesize[comp] == 0) {
                         break;
                 }
                 for (ptrdiff_t y = 0; y < height; ++y) {
-                        memcpy(out_frame->data[comp] + y * out_frame->linesize[comp], in_data + y * linesize,
-                                        linelength);
+                        memcpy(out_frame->data[comp] + y * out_frame->linesize[comp], in_data + y * out_frame->linesize[comp],out_frame->linesize[comp]);
                 }
         }
 }

@@ -550,7 +550,7 @@ __global__ void xv30_to_intermediate(char * __restrict dst_buffer, size_t pitch,
     void *src_row = in_frame->data[0] + in_frame->linesize[0] *  y;
     void *dst_row = dst_buffer + y * pitch;
 
-    char * src = ((char *) src_row) + 4 * x;
+    uint32_t * src = ((uint32_t *) src_row) + x;
     uint16_t * dst = ((uint16_t *) dst_row) + 4 * x;
 
     uint32_t in = *src;
@@ -819,29 +819,29 @@ __global__ void y210_to_intermediate(char * __restrict dst_buffer, size_t pitch,
     size_t x = blockDim.x * blockIdx.x + threadIdx.x;
     size_t y = blockDim.y * blockIdx.y + threadIdx.y;
 
-    if (x >= width || y >= height)
+    if (x >= width / 2 || y >= height)
         return;
 
     void *src_row = in_frame->data[0] + in_frame->linesize[0] *  y;
     void *dst_row = dst_buffer + y * pitch;
 
-    char *src = ((char *) src_row) + 4 * x;
+    uint16_t *src = ((uint16_t *) src_row) + 4 * x;
     uint16_t *dst = ((uint16_t *) dst_row) + 4 * 2 * x;
 
-    char y0, u, y1, v;
+    unsigned y0, u, y1, v;
     y0 = *src++;
     u = *src++;
     y1 = *src++;
     v = *src;
 
-    *dst++ = u << 8;
-    *dst++ = y0 << 8;
-    *dst++ = v << 8;
+    *dst++ = u;
+    *dst++ = y0;
+    *dst++ = v;
     *dst++ = 0xFFFFU;
 
-    *dst++ = u << 8;
-    *dst++ = y1 << 8;
-    *dst++ = v << 8;
+    *dst++ = u;
+    *dst++ = y1;
+    *dst++ = v;
     *dst   = 0xFFFFU;
 }
 
@@ -864,12 +864,12 @@ __global__ void p210_to_inter(char * __restrict dst_buffer, size_t pitch, int wi
     cb = *src_cbcr++;
     cr = *src_cbcr;
 
-    *dst = cb;
+    *dst++ = cb;
     *dst++ = *src_y++;
     *dst++ = cr;
     *dst++ =  0xFFFFU;
 
-    *dst = cb;
+    *dst++ = cb;
     *dst++ = *src_y;
     *dst++ = cr;
     *dst   =  0xFFFFU;
@@ -1143,7 +1143,7 @@ int convert_xv30_to_inter(const AVFrame  *frame, char * intermediate, AVFrame *g
     dim3 grid = dim3((width + BLOCK_SIZE - 1) / BLOCK_SIZE, (height + BLOCK_SIZE - 1) / BLOCK_SIZE );
     dim3 block = dim3(BLOCK_SIZE, BLOCK_SIZE);
 
-    y210_to_intermediate<<<grid, block>>>(intermediate, pitch, width, height, gpu_frame);
+    xv30_to_intermediate<<<grid, block>>>(intermediate, pitch, width, height, gpu_frame);
     return YUV_INTER;
 }
 

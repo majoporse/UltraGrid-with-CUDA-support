@@ -416,6 +416,29 @@ __global__ void convert_p210_from_inter(int width, int height, size_t pitch_in, 
     *dst_y++ = src[1];
     *dst_y = src[5];
 }
+
+__global__ void convert_xv30_from_inter(int width, int height, size_t pitch_in, char * in, AVFrame *out_frame){
+    size_t x = blockDim.x * blockIdx.x + threadIdx.x;
+    size_t y = blockDim.y * blockIdx.y + threadIdx.y;
+
+    if (x >= width || y >= height)
+        return;
+
+    void *dst_row = out_frame->data[0] + out_frame->linesize[0] * y;
+    void *src_row = in + y * pitch_in;
+
+    uint32_t *dst = ((uint32_t *) dst_row) + x;
+    uint16_t *src = ((uint16_t *) src_row) + 4 * x;
+
+    uint16_t u = *src++;
+    uint16_t y1 = *src++;
+    uint16_t v = *src++;
+    uint16_t a = *src++;
+    *dst  = (v >> 6U) << 20U |
+            (y1 >> 6U) << 10U |
+            (u >> 6U);
+
+}
 /**************************************************************************************************************/
 /*                                             KERNELS TO                                                     */
 /**************************************************************************************************************/
@@ -932,7 +955,7 @@ void y210_from_inter(int width, int height, char *intermediate_to, AVFrame *dst_
 
     size_t pitch_in = vc_get_linesize(width, Y416);
 
-    dim3 grid = dim3((width + BLOCK_SIZE - 1) / BLOCK_SIZE, (height + BLOCK_SIZE - 1) / BLOCK_SIZE );
+    dim3 grid = dim3((width / 2 + BLOCK_SIZE - 1) / BLOCK_SIZE, (height + BLOCK_SIZE - 1) / BLOCK_SIZE );
     dim3 block = dim3(BLOCK_SIZE, BLOCK_SIZE);
     convert_y210_from_inter<<<grid, block>>>(width, height, pitch_in, intermediate_to, dst_frame);
 }
@@ -946,6 +969,17 @@ void p210_from_inter(int width, int height, char *intermediate_to, AVFrame *dst_
     dim3 block = dim3(BLOCK_SIZE, BLOCK_SIZE);
     convert_p210_from_inter<<<grid, block>>>(width, height, pitch_in, intermediate_to, dst_frame);
 }
+
+
+void xv30_from_inter(int width, int height, char *intermediate_to, AVFrame *dst_frame){
+
+    size_t pitch_in = vc_get_linesize(width, Y416);
+
+    dim3 grid = dim3((width + BLOCK_SIZE - 1) / BLOCK_SIZE, (height + BLOCK_SIZE - 1) / BLOCK_SIZE );
+    dim3 block = dim3(BLOCK_SIZE, BLOCK_SIZE);
+    convert_xv30_from_inter<<<grid, block>>>(width, height, pitch_in, intermediate_to, dst_frame);
+}
+
 /**************************************************************************************************************/
 /*                                                LISTS                                                       */
 /**************************************************************************************************************/
@@ -1038,7 +1072,7 @@ const std::map<AVPixelFormat, std::tuple<int, void (*)(int, int, char *, AVFrame
         {AV_PIX_FMT_P210LE, {YUV_INTER_TO, p210_from_inter}},
 #endif
 #if XV3X_PRESENT
-        {AV_PIX_FMT_XV30, {YUV_INTER_TO, y210_from_inter}}, //idk how to test these
+        {AV_PIX_FMT_XV30, {YUV_INTER_TO, xv30_from_inter}}, //idk how to test these
         {AV_PIX_FMT_Y212, {YUV_INTER_TO, y210_from_inter}}, //idk how to test these
 #endif
 #if VUYX_PRESENT
