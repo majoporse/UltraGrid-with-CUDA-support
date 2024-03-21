@@ -1253,7 +1253,7 @@ const std::map<int, int (*) (const AVFrame *, char *, AVFrame *)> conversions_to
 #endif
 #if VUYX_PRESENT
         {AV_PIX_FMT_VUYA, convert_yuva_to_inter<true>}, //idk how to test these
-        {AV_PIX_FMT_VUYX, convert_yuva_to_inter<false>} //idk how to test these
+        {AV_PIX_FMT_VUYX, convert_yuva_to_inter<false>}, //idk how to test these
 #endif
 #if X2RGB10LE_PRESENT
         {AV_PIX_FMT_X2RGB10LE, convert_rgb_to_inter<uint8_t, 0, true, AV_PIX_FMT_X2RGB10LE>}, //shift doesnt matter
