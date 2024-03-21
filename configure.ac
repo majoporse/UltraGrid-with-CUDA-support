@@ -1811,8 +1811,8 @@ then
         LIBAVCODEC_VIDEO="src/libavcodec/lavc_video.o src/libavcodec/from_lavc_vid_conv.o src/libavcodec/to_lavc_vid_conv.o"
         if test "$lavc_cuda_conv_req" != no && test "$FOUND_CUDA" = yes; then
                 AC_DEFINE([HAVE_LAVC_CUDA_CONV], [1], [Build with lavc CUDA conversions])
-                to_lavc_cuda_obj=src/libavcodec/to_lavc_vid_conv_cuda.o
-                LIBAVCODEC_VIDEO="$LIBAVCODEC_VIDEO $to_lavc_cuda_obj src/libavcodec/from_lavc_vid_conv_cuda.o"
+                to_lavc_cuda_obj="src/libavcodec/to_lavc_vid_conv_cuda.o src/libavcodec/cuda_utils.o"
+                LIBAVCODEC_VIDEO="$LIBAVCODEC_VIDEO $to_lavc_cuda_obj src/libavcodec/from_lavc_vid_conv_cuda.o src/libavcodec/cuda_utils.o"
         fi
         AC_DEFINE([HAVE_LAVC], [1], [Build with LAVC support])
         if test $lavc_hwacc_vdpau = yes; then
