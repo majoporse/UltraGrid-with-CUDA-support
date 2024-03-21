@@ -65,7 +65,7 @@ const std::vector<std::tuple<codec_t, AVPixelFormat, int>> convs = {
             { R12L, AV_PIX_FMT_GBRP16LE, 2},
             { RG48, AV_PIX_FMT_GBRP12LE, 2},
 #if XV3X_PRESENT
-            { v210, AV_PIX_FMT_XV30, 1 },
+            { v210, AV_PIX_FMT_XV30, 1 }, 
             { Y216, AV_PIX_FMT_Y212, 2 },
             { Y416, AV_PIX_FMT_XV30, 1 },
             { v210, AV_PIX_FMT_Y212, 2 },
@@ -136,6 +136,7 @@ void benchmark(int width, int height, codec_t UG_format, AVPixelFormat AV_format
         std::cout << "cannot find RG48 -> UG format\n";
         return;
     }
+
     std::vector<unsigned char> UG_converted(vc_get_datalen(width, height, UG_format));
     for (int y = 0; y < height; ++y){
         decode(UG_converted.data() + y * vc_get_linesize(width, UG_format),
@@ -149,7 +150,7 @@ void benchmark(int width, int height, codec_t UG_format, AVPixelFormat AV_format
 
     AVFrame *frame2 = nullptr;
     struct to_lavc_vid_conv *conv_to_av = to_lavc_vid_conv_init(UG_format, width, height, AV_format, 1);
-    if (conv_to_av && !(AV_format == AV_PIX_FMT_Y210 && (UG_format == RG48 || UG_format == Y216))){ //UG crashes here for some reason
+    if (conv_to_av){
         for (int i = 0; i < 10; ++i){
             auto t1 = std::chrono::high_resolution_clock::now();
             frame2 = to_lavc_vid_conv(conv_to_av, (char *) UG_converted.data());
@@ -168,8 +169,8 @@ void benchmark(int width, int height, codec_t UG_format, AVPixelFormat AV_format
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
 
-    //convert UG -> AV
-    //-------------------------------------------gpu version
+    // convert UG -> AV
+    // -------------------------------------------gpu version
     AVFrame *frame1 = nullptr;
     float count_gpu = 0;
 

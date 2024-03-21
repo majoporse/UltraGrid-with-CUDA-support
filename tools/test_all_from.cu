@@ -114,6 +114,31 @@ const std::vector<std::tuple<AVPixelFormat, codec_t>> in_codecs = {
         {AV_PIX_FMT_GBRP12LE, RGBA},
         {AV_PIX_FMT_RGB48LE, R12L},
         {AV_PIX_FMT_RGB48LE, RGBA},
+#if VUYX_PRESENT
+        {AV_PIX_FMT_VUYA, UYVY},
+        {AV_PIX_FMT_VUYX, UYVY},
+        {AV_PIX_FMT_VUYA, Y416},
+        {AV_PIX_FMT_VUYX, Y416},
+#endif
+#if P210_PRESENT
+        {AV_PIX_FMT_P210LE, v210},
+        {AV_PIX_FMT_P210LE, UYVY},
+#endif
+#if XV3X_PRESENT
+        {AV_PIX_FMT_XV30,   UYVY},
+        {AV_PIX_FMT_XV30,   v210},
+        {AV_PIX_FMT_XV30,   Y416},
+        {AV_PIX_FMT_Y212,   UYVY},
+        {AV_PIX_FMT_Y212,   v210},
+        {AV_PIX_FMT_Y212,   Y416},
+        {AV_PIX_FMT_Y212,   Y216},
+#endif
+#if Y210_PRESENT
+        {AV_PIX_FMT_Y210,   UYVY},
+        {AV_PIX_FMT_Y210,   v210},
+        {AV_PIX_FMT_Y210,   Y416},
+        {AV_PIX_FMT_Y210,   Y216},
+#endif
 };
 const std::map<codec_t, codec_t> convs = {{R10k, RG48}, {R12L, RG48}, {v210, RG48}};
 
@@ -262,7 +287,6 @@ void benchmark(AVFrame *f1, AVPixelFormat AV_format, codec_t UG_format, std::ofs
          << "----------------------------------------------\n";
 
     //clean-up
-    std::cout << "A "; std::cout.flush();
     av_frame_free(&converted);
     av_to_uv_conversion_cuda_destroy(&state);
     cudaEventDestroy(start);
