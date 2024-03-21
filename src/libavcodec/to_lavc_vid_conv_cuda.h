@@ -94,7 +94,6 @@ AVFrame *to_lavc_vid_conv_cuda(to_lavc_conv_cuda *, const char *src);
 to_lavc_conv_cuda *to_lavc_vid_conv_cuda_init(enum AVPixelFormat, codec_t, int, int);
 
 void to_lavc_vid_conv_cuda_destroy(to_lavc_conv_cuda **);
->>>>>>> abc5c294b (removed c++20 features + some interface changes to work with UG)
 
 #else
 #include <stdio.h>
