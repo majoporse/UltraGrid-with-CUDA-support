@@ -803,7 +803,7 @@ __global__ void vuya_to_intermediate(char * __restrict dst_buffer, size_t pitch,
     void *src_row = in_frame->data[0] + in_frame->linesize[0] *  y;
     void *dst_row = dst_buffer + y * pitch;
 
-    char *src = ((char *) src_row) + (has_alpha ? 4 : 3) * x;
+    char *src = ((char *) src_row) + 4 * x;
     uint16_t *dst = ((uint16_t *) dst_row) + 4 * x;
 
     *dst++ = src[1] << 8U;
@@ -812,7 +812,7 @@ __global__ void vuya_to_intermediate(char * __restrict dst_buffer, size_t pitch,
     if constexpr (has_alpha)
         *dst = src[3] << 8U;
     else
-        *dst = 0xFFFF;
+        *dst = 0xFFFFU;
 }
 
 __global__ void y210_to_intermediate(char * __restrict dst_buffer, size_t pitch, int width, int height, AVFrame *in_frame){

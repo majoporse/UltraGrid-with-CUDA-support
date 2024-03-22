@@ -147,12 +147,12 @@ __global__ void convert_rgb_from_inter(int width, int height, size_t pitch_in, c
         *dst++ = (((src[0] >> 6U) & 0xFU) << 4U) | (src[1] >> 12U); // R[->4] | G[<-4]
         *dst++ = (src[0] >> 10U); // [2x r<6]
     } else{
-        *dst++ = *src++ >> bit_shift;
-        *dst++ = *src++ >> bit_shift;
-        *dst++ = *src++ >> bit_shift;
+        *dst++ = src[0] >> bit_shift;
+        *dst++ = src[1] >> bit_shift;
+        *dst++ = src[2] >> bit_shift;
     }
     if constexpr (has_alpha && CODEC != AV_PIX_FMT_X2RGB10LE){
-        *dst = *src >> bit_shift;
+        *dst = src[3] >> bit_shift;
     }
 }
 
@@ -167,7 +167,7 @@ __global__ void convert_vuya_from_inter(int width, int height, size_t pitch_in, 
     void *dst_row = out_frame->data[0] + out_frame->linesize[0] * y;
     void *src_row = in + y * pitch_in;
 
-    uint8_t *dst = ((uint8_t *) dst_row) + (has_alpha ? 4 : 3) * x;
+    uint8_t *dst = ((uint8_t *) dst_row) + 4 * x;
     uint16_t *src = ((uint16_t *) src_row) + 4 * x;
 
     //uyva -> vuya
@@ -177,7 +177,7 @@ __global__ void convert_vuya_from_inter(int width, int height, size_t pitch_in, 
     if constexpr (has_alpha)
         *dst = src[3] >> 8U;
     else
-        *dst = 0xFFU;
+        *dst = 0xFFFFU;
 }
 
 template<typename OUT_T,int bit_shift>
@@ -534,7 +534,7 @@ __global__ void convert_rgb_to_rgb_inter(int width, int height, size_t pitch_in,
     *dst++ = g;
     *dst++ = b;
 
-    if constexpr (has_alpha){
+    if constexpr (has_alpha && CODEC != R10k){
         *dst = *src << bit_shift;
     } else{
         *dst = 0xFFFFU;

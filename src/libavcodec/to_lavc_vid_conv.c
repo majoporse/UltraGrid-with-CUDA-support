@@ -1055,7 +1055,7 @@ static void r10k_to_bgr0(AVFrame * __restrict out_frame, const unsigned char * _
         for (int y = 0; y < height; ++y) {
                 const unsigned char *src = in_data + y * src_linesize;
                 unsigned char *dst = out_frame->data[0] + out_frame->linesize[0] * y;
-                vc_copyliner10k(dst, src, dst_linesize, 16, 8, 0);
+                vc_copyliner10k(dst, src, dst_linesize, 16, 8, 0 );
         }
 }
 
