@@ -1,4 +1,5 @@
 #include "to_lavc_vid_conv_cuda.h"
+#include <array>
 #include <map>
 #include <algorithm>
 #include <iostream>
