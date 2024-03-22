@@ -1123,7 +1123,7 @@ extern "C" AVFrame *to_lavc_vid_conv_cuda(to_lavc_conv_cuda* state, const char *
     return internal_frame;
 }
 
-std::array subsamp = {
+std::array<AVPixelFormat, 7> subsamp = {
         AV_PIX_FMT_YUV420P,
         AV_PIX_FMT_YUV420P10LE,
         AV_PIX_FMT_YUV420P12LE,
