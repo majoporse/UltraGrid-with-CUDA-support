@@ -18,19 +18,19 @@ template <typename OUT_T, codec_t codec, bool has_alpha>
 __device__ void RGB_from_rgb(void *dst_row, int x, uint16_t r, uint16_t g, uint16_t b, uint16_t a){
 
     OUT_T *dst;
-    if constexpr (codec == RGBA || codec == R10k){
+    if (codec == RGBA || codec == R10k){
         dst = ((OUT_T *) dst_row ) + 4 * x;
     } else {
         dst = ((OUT_T *) dst_row) + 3 * x;
     }
 
-    if constexpr (codec == BGR){
+    if (codec == BGR){
         *dst++ = b;
         *dst++ = g;
         *dst++ = r;
         if (has_alpha)
             *dst++ = a;
-    } else if constexpr (codec == R10k){
+    } else if (codec == R10k){
         *dst++ = r >> 2U;
         *dst++ = (r & 0x3U) << 6U | g >> 4U;
         *dst++ = (g & 0xFU) << 4U | b >> 6U;
@@ -129,7 +129,7 @@ __device__ void write_uyvy(DST *dst, FUNC GET_VALS){
     DST u, y0, v, y1;
     GET_VALS(u, y0, v, y1);
 
-    if constexpr (!is_reversed){
+    if (!is_reversed){
         *dst++ =  u;
         *dst++ = y0;
         *dst++ =  v;
@@ -748,7 +748,7 @@ __global__ void gbrap_to_intermediate(char * __restrict dst_buffer, size_t pitch
     *dst++ = *src_r << bit_shift;
     *dst++ = *src_g << bit_shift;
     *dst++ = *src_b << bit_shift;
-    if constexpr (has_alpha){
+    if (has_alpha){
         void * src_a_row = in_frame->data[3] + in_frame->linesize[3] * y;
         IN_T *src_a =((IN_T *) src_a_row) + x;
         *dst = *src_a << bit_shift;
@@ -771,7 +771,7 @@ __global__ void rgb_to_intermediate(char * __restrict dst_buffer, size_t pitch, 
     IN_T *src = ((IN_T *) src_row) + (has_alpha ? 4 : 3) * x;
     uint16_t *dst = ((uint16_t *) dst_row) + 4 * x;
 
-    if constexpr (CODEC == AV_PIX_FMT_BGRA){
+    if (CODEC == AV_PIX_FMT_BGRA){
         *dst++ = src[2] << bit_shift;//B
         *dst++ = src[1] << bit_shift;//G
         *dst++ = src[0] << bit_shift;//R
@@ -785,7 +785,7 @@ __global__ void rgb_to_intermediate(char * __restrict dst_buffer, size_t pitch, 
         dst[1] = src[1] << bit_shift;
         dst[2] = src[2] << bit_shift;
     }
-    if constexpr (has_alpha && CODEC != AV_PIX_FMT_X2RGB10LE){
+    if (has_alpha && CODEC != AV_PIX_FMT_X2RGB10LE){
         dst[3] = src[3];
     } else{
         dst[3] = 0xFFFFU;
@@ -809,7 +809,7 @@ __global__ void vuya_to_intermediate(char * __restrict dst_buffer, size_t pitch,
     *dst++ = src[1] << 8U;
     *dst++ = src[2] << 8U;
     *dst++ = src[0] << 8U;
-    if constexpr (has_alpha)
+    if (has_alpha)
         *dst = src[3] << 8U;
     else
         *dst = 0xFFFFU;

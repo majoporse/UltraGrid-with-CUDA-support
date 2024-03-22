@@ -40,7 +40,7 @@ __global__ void convert_rgbp_from_inter(int width, int height, size_t pitch_in, 
     *dst_r = *src++ >> bit_shift;
     *dst_g = *src++ >> bit_shift;
     *dst_b = *src++ >> bit_shift;
-    if constexpr (has_alpha){
+    if (has_alpha){
         void * dst_a_row = frame->data[3] + frame->linesize[3] * y;
         OUT_T *dst_a =((OUT_T *) dst_a_row) + x;
         *dst_a = *src >> bit_shift;
@@ -139,11 +139,11 @@ __global__ void convert_rgb_from_inter(int width, int height, size_t pitch_in, c
     IN_T *dst = ((IN_T *) dst_row) + (has_alpha ? 4 : 3) * x;
     uint16_t *src = ((uint16_t *) src_row) + 4 * x;
 
-    if constexpr (CODEC == AV_PIX_FMT_BGRA){
+    if (CODEC == AV_PIX_FMT_BGRA){
         *dst++ = src[2] >> bit_shift;//B
         *dst++ = src[1] >> bit_shift;//G
         *dst++ = src[0] >> bit_shift;//R
-    } else if constexpr (CODEC == AV_PIX_FMT_X2RGB10LE){
+    } else if (CODEC == AV_PIX_FMT_X2RGB10LE){
         *dst++ = src[2] >> 6U; //B[->8]
         *dst++ = (((src[1] >> 6U) & 0x3FU) << 2U) | (src[2] >> 14U); // G[->6] | B[<-2]
         *dst++ = (((src[0] >> 6U) & 0xFU) << 4U) | (src[1] >> 12U); // R[->4] | G[<-4]
@@ -153,7 +153,7 @@ __global__ void convert_rgb_from_inter(int width, int height, size_t pitch_in, c
         *dst++ = src[1] >> bit_shift;
         *dst++ = src[2] >> bit_shift;
     }
-    if constexpr (has_alpha && CODEC != AV_PIX_FMT_X2RGB10LE){
+    if (has_alpha && CODEC != AV_PIX_FMT_X2RGB10LE){
         *dst = src[3] >> bit_shift;
     }
 }
@@ -176,7 +176,7 @@ __global__ void convert_vuya_from_inter(int width, int height, size_t pitch_in, 
     *dst++ = src[2] >> 8U;
     *dst++ = src[0] >> 8U;
     *dst++ = src[1] >> 8U;
-    if constexpr (has_alpha)
+    if (has_alpha)
         *dst = src[3] >> 8U;
     else
         *dst = 0xFFU;
@@ -461,7 +461,7 @@ __global__ void convert_rgb_to_yuv_inter(int width, int height, size_t pitch_in,
     uint16_t *dst = ((uint16_t *) dst_row) + 4 * x;
 
     comp_type_t r, g, b, y1, u, v;
-    if constexpr (CODEC == R10k){
+    if (CODEC == R10k){
         uint8_t byte1 = *src++;
         uint8_t byte2 = *src++;
         uint8_t byte3 = *src++;
@@ -489,7 +489,7 @@ __global__ void convert_rgb_to_yuv_inter(int width, int height, size_t pitch_in,
     *dst++ = CLAMP_LIMITED_Y(y1, 16);
     *dst++ = CLAMP_LIMITED_CBCR(v, 16);
 
-    if constexpr (has_alpha){
+    if (has_alpha){
         *dst = *src << bit_shift;
     } else{
         *dst = 0xFFFFU;
@@ -513,7 +513,7 @@ __global__ void convert_rgb_to_rgb_inter(int width, int height, size_t pitch_in,
     uint16_t *dst = ((uint16_t *) dst_row) + 4 * x;
 
     uint16_t r, g, b;
-    if constexpr (CODEC == R10k){
+    if (CODEC == R10k){
         uint8_t byte1 = *src++;
         uint8_t byte2 = *src++;
         uint8_t byte3 = *src++;
@@ -522,7 +522,7 @@ __global__ void convert_rgb_to_rgb_inter(int width, int height, size_t pitch_in,
         r = byte1 << 8U | (byte2 & 0xC0U);
         g = (byte2 & 0x3FU) << 10U | (byte3 & 0xF0U) << 2U;
         b = (byte3 & 0xFU) << 12U | (byte4 & 0xFCU) << 4U;
-    } else if constexpr (CODEC == BGR){
+    } else if (CODEC == BGR){
         r = src[2] << bit_shift;
         g = src[1] << bit_shift;
         b = src[0] << bit_shift;
@@ -536,7 +536,7 @@ __global__ void convert_rgb_to_rgb_inter(int width, int height, size_t pitch_in,
     *dst++ = g;
     *dst++ = b;
 
-    if constexpr (has_alpha && CODEC != R10k){
+    if (has_alpha && CODEC != R10k){
         *dst = *src << bit_shift;
     } else{
         *dst = 0xFFFFU;
@@ -593,7 +593,7 @@ __global__ void convert_uyvy_to_yuv_inter(int width, int height, size_t pitch_in
     IN_T *src = ((IN_T *) src_row) + 4 * x;
     uint16_t *dst = ((uint16_t *) dst_row) + 4 * 2 * x;
 
-    if constexpr (is_reversed){
+    if (is_reversed){
         *dst++ =  src[1] << bit_shift; //U
         *dst++ =  src[0] << bit_shift; //Y1
         *dst++ =  src[3] << bit_shift; //V
@@ -634,7 +634,7 @@ __global__ void convert_uyvy_to_rgb_inter(int width, int height, size_t pitch_in
 
     comp_type_t y1, y2, u, v, r ,g, b;
 
-    if constexpr (is_reversed){
+    if (is_reversed){
         y1 =  src[0] << bit_shift;
         u =  src[1] << bit_shift;
         y2 =  src[2] << bit_shift;
