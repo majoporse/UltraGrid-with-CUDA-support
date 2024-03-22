@@ -2,6 +2,7 @@
 #include <map>
 #include <algorithm>
 #include <iostream>
+#include <tuple>
 #include "../color.h"
 #include <array>
 #include "cuda_utils.h"
@@ -177,7 +178,7 @@ __global__ void convert_vuya_from_inter(int width, int height, size_t pitch_in, 
     if constexpr (has_alpha)
         *dst = src[3] >> 8U;
     else
-        *dst = 0xFFFFU;
+        *dst = 0xFFU;
 }
 
 template<typename OUT_T,int bit_shift>
@@ -1096,8 +1097,9 @@ extern "C" AVFrame *to_lavc_vid_conv_cuda(to_lavc_conv_cuda* state, const char *
     auto gpu_wrapper = state->gpu_wrapper;
     auto intermediate = state->intermediate_to;
 
-    auto [inter, converter_from_inter] = conversions_from_inter.at(static_cast<AVPixelFormat>(internal_frame->format));
-
+    auto tuple = conversions_from_inter.at(static_cast<AVPixelFormat>(internal_frame->format));
+    auto inter = std::get<0>(tuple);
+    auto converter_from_inter = std::get<1>(tuple);
     //copy the image to gpu
     cudaMemcpy(gpu_in_buffer, src, vc_get_datalen(internal_frame->width, internal_frame->height, UG_codec), cudaMemcpyHostToDevice);
     //copy the destination to gpu
