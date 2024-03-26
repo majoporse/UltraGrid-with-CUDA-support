@@ -3,7 +3,7 @@
  * @author Martin Pulec     <pulec@cesnet.cz>
  */
 /*
- * Copyright (c) 2023 CESNET, z. s. p. o.
+ * Copyright (c) 2023-2024 CESNET, z. s. p. o.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,11 +35,13 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#include "config_unix.h"
-#include "config_win32.h"
-
 #include <caca.h>
+#include <pthread.h>          // for pthread_mutex_unlock, pthread_cond_destroy
+#include <stdbool.h>          // for bool, true, false
+#include <stdio.h>            // for snprintf
+#include <stdlib.h>           // for NULL, calloc, free, getenv, size_t
+#include <string.h>           // for strcmp, strlen, memcpy, strchr, strstr
+#include <time.h>             // for timespec_get, TIME_UTC, timespec
 
 #include "debug.h"
 #include "lib_common.h"
@@ -68,6 +70,8 @@ struct state_caca {
         pthread_cond_t frame_consumed_cv;
 };
 
+static bool  display_caca_putf(void *state, struct video_frame *frame,
+                               long long timeout_ns);
 static void *worker(void *arg);
 
 static void display_caca_probe(struct device_info **available_cards, int *count, void (**deleter)(void *))
@@ -82,6 +86,9 @@ static void display_caca_done(void *state)
 {
         struct state_caca *s = state;
         if (s->started) {
+                if (!s->should_exit) {
+                        display_caca_putf(state, NULL, PUTF_BLOCKING);
+                }
                 pthread_join(s->thread_id, NULL);
         }
         if (s->dither) {

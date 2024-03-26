@@ -3,7 +3,7 @@
  * @author Martin Pulec     <pulec@cesnet.cz>
  */
 /*
- * Copyright (c) 2013 CESNET, z. s. p. o.
+ * Copyright (c) 2013-2024 CESNET, z. s. p. o.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,10 +35,6 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "utils/misc.h" // get_cpu_core_count
-#include "utils/thread.h"
-#include "utils/worker.h"
-
 #include <algorithm>
 #include <cassert>
 #include <pthread.h>
@@ -46,7 +42,15 @@
 #include <set>
 #include <vector>
 
-using namespace std;
+#include "utils/macros.h" // for MAX_CPU_CORES
+#include "utils/misc.h"   // get_cpu_core_count
+#include "utils/thread.h"
+#include "utils/worker.h"
+
+using std::min;
+using std::queue;
+using std::set;
+using std::vector;
 
 struct wp_worker;
 
@@ -327,8 +331,8 @@ static void *respawn_parallel_task(void *arg) {
  */
 void respawn_parallel(void *in, void *out, size_t nmemb, size_t size, respawn_parallel_callback_t c, void *udata)
 {
-        int threads = get_cpu_core_count();
-        struct respawn_parallel_data data[threads];
+        const int threads = min<int>(get_cpu_core_count(), MAX_CPU_CORES);
+        struct respawn_parallel_data data[MAX_CPU_CORES];
 
         for (int i = 0; i < threads; ++i) {
                 data[i].c = c;

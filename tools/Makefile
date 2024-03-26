@@ -7,6 +7,10 @@ vpath %.c $(SRCDIR) $(SRCDIR)/tools
 vpath %.cpp $(SRCDIR) $(SRCDIR)/tools
 vpath %.cu $(SRCDIR) $(SRCDIR)/tools
 
+TARGETS=astat_lib astat_test convert decklink_temperature uyvy2yuv422p thumbnailgen
+
+all: $(TARGETS)
+
 %.o : %.c
 	$(MKDIR_P) $(dir $@)
 	$(CC) -D HAVE_LAVC_CUDA_CONV=1 -D TEST_CONVERSIONS=1 $(COMMON_FLAGS) -c $< -o $@
@@ -41,11 +45,6 @@ uyvy2yuv422p: uyvy2yuv422p.c
 
 thumbnailgen: thumbnailgen.o ipc_frame.o ipc_frame_unix.o
 	$(CXX) $^ -o $@ -ljpeg
-
-
-TARGETS=astat_lib astat_test convert decklink_temperature uyvy2yuv422p thumbnailgen
-
-all: $(TARGETS)
 
 clean:
 	$(RM) $(TARGETS) *o
