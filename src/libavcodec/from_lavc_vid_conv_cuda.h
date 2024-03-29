@@ -76,15 +76,37 @@ typedef struct {
     AVFrame *gpu_frame;
 } from_lavc_conv_state;
 
-// #define HAVE_CUDA
-#ifdef HAVE_LAVC_CUDA_CONV
-
+/**
+ * @brief performs the conversion from AVFrame to UG
+        needs av_to_uv_conversion_cuda_init to be called first for allocation of the buffers
+        also needs pre-allocated buffer to write to
+ * 
+ * @param state state from av_to_uv_conversion_cuda_init
+ * @param frame freame to convert
+ * @param dst pre-allocated buffer
+ */
 void av_to_uv_convert_cuda(from_lavc_conv_state *state, const AVFrame* frame, char *dst);
 
- from_lavc_conv_state *av_to_uv_conversion_cuda_init(const AVFrame*, codec_t);
+/**
+ * @brief initializes the conversion state
+        allocates the buffers necessary for the conversion
+ * 
+ * @param frame frame is used to pass linesizes, codec, width, height...
+                does not convert any frames
+ * @param codec codec to convert to
+ * @return from_lavc_conv_state* state to use in av_to_uv_convert_cuda
+ */
+from_lavc_conv_state *av_to_uv_conversion_cuda_init(const AVFrame*, codec_t);
 
-void av_to_uv_conversion_cuda_destroy(from_lavc_conv_state **);
-#else
+/**
+ * @brief destroys the conversion state
+        frees the buffers allocated in av_to_uv_conversion_cuda_init
+ * 
+ * @param s state to destroy
+ */
+void av_to_uv_conversion_cuda_destroy(from_lavc_conv_state **s);
+
+#ifndef HAVE_LAVC_CUDA_CONV
 
 void  av_to_uv_convert_cuda(from_lavc_conv_state *state,  const AVFrame* frame, char * dst){
     (void) state; (void) frame; (void) dst;

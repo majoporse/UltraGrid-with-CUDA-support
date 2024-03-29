@@ -86,16 +86,35 @@ typedef struct {
     AVF_GPU_wrapper *gpu_wrapper;
 } to_lavc_conv_cuda;
 
-// #define HAVE_CUDA
-#ifdef HAVE_LAVC_CUDA_CONV
+/**
+ * @brief performs the conversion from the source format to the target format
+ * 
+ * @param state state from the to_lavc_vid_conv_cuda_init
+ * @param src source of the data
+ * @return converted frame
+        always returns the samem pointer. it just rewrites the old one
+ */
+AVFrame *to_lavc_vid_conv_cuda(to_lavc_conv_cuda *state, const char *src);
 
-AVFrame *to_lavc_vid_conv_cuda(to_lavc_conv_cuda *, const char *src);
-
+/**
+ * @brief initializes the conversion state and all buffers necessary
+ * 
+ * @param f source format
+ * @param c target codec
+ * @param w width of the frame
+ * @param h height of the frame
+ * @return null if format not found or conversion state
+ */
 to_lavc_conv_cuda *to_lavc_vid_conv_cuda_init(enum AVPixelFormat, codec_t, int, int);
 
+/**
+ * @brief destroys the conversion state and all buffers
+ * 
+ * @param state conversion state
+ */
 void to_lavc_vid_conv_cuda_destroy(to_lavc_conv_cuda **);
 
-#else
+#ifndef HAVE_LAVC_CUDA_CONV
 #include <stdio.h>
 
 to_lavc_conv_cuda *to_lavc_vid_conv_cuda_init(enum AVPixelFormat f, codec_t c, int w, int h)
